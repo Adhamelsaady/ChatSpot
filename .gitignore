@@ -1,0 +1,25 @@
+# --- Build Artifacts ---
+bin/
+obj/
+
+# --- IDE Settings ---
+.idea/
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# --- .NET Core / ASP.NET Core ---
+appsettings.Development.json
+# (Only ignore appsettings.Development if it contains secrets; 
+# otherwise, keep it for team consistency)
+
+# --- Publishing / Outputs ---
+publish/
+*.exe
+*.dll
+*.pdb
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
