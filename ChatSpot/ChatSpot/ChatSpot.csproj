@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="16.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.13" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.13" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.13" />
@@ -20,11 +21,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Contracts\" />
+      <Folder Include="Contracts\Persistence\" />
       <Folder Include="Controllers\" />
+      <Folder Include="Infrastrcutre\" />
       <Folder Include="Models\NoSQL\" />
       <Folder Include="Repositories\" />
-      <Folder Include="Services\" />
     </ItemGroup>
 
 </Project>

@@ -18,6 +18,7 @@ public class ApplicationUser : IdentityUser
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public string? Otp { get; set; }
+    
     public DateTime? OtpExpiry { get; set; }
     
     public ICollection<GroupMember> GroupMemberships { get; set; } = new List<GroupMember>();
