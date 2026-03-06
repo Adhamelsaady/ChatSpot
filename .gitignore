@@ -1,25 +1,22 @@
-# --- Build Artifacts ---
+# --- Build & Temporary Files ---
+# These are generated during compilation and should not be tracked.
 bin/
 obj/
 
-# --- IDE Settings ---
+# --- IDE Settings (JetBrains Rider / IntelliJ) ---
+# This folder contains local IDE configurations and layouts.
 .idea/
-.vs/
+
+# --- Environment Specific Settings ---
+# Often contains local secrets or connection strings.
+appsettings.Development.json
+appsettings.json
+
+# --- User-Specific Files ---
 *.user
 *.userosscache
 *.sln.docstates
 
-# --- .NET Core / ASP.NET Core ---
-appsettings.Development.json
-# (Only ignore appsettings.Development if it contains secrets; 
-# otherwise, keep it for team consistency)
-
-# --- Publishing / Outputs ---
-publish/
-*.exe
-*.dll
-*.pdb
-
-# --- OS Specific ---
+# --- OS Generated Files ---
 .DS_Store
 Thumbs.db
