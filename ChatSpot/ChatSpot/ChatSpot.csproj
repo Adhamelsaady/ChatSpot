@@ -8,6 +8,8 @@
 
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="16.1.0" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+        <PackageReference Include="MailKit" Version="4.15.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.13" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.13" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.13" />
@@ -23,7 +25,8 @@
     <ItemGroup>
       <Folder Include="Contracts\Persistence\" />
       <Folder Include="Controllers\" />
-      <Folder Include="Infrastrcutre\" />
+      <Folder Include="Dtos\Outgoing\" />
+      <Folder Include="Helpers\" />
       <Folder Include="Models\NoSQL\" />
       <Folder Include="Repositories\" />
     </ItemGroup>

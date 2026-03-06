@@ -21,5 +21,6 @@ public static class PersistenceConfigurations
             })
             .AddEntityFrameworkStores<ChatSpotDbContext>()
             .AddDefaultTokenProviders();
+        // todo : add the repositories when done here
     }
 }
