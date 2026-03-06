@@ -1,52 +1,16 @@
-## --- CHATSPOT PROJECT SPECIFIC ---
-# Ignore local environment settings (protects secrets/local DB strings)
-ChatSpot/appsettings.json
-ChatSpot/appsettings.Development.json
+# Build
+bin/
+obj/
 
-## --- BUILD ARTIFACTS ---
-# Ignore compiled code and temporary build files
-[Bb]in/
-[Oo]bj/
-[Dd]ebug/
-[Rr]elease/
-*.msi
-*.exe
-*.dll
-*.pdb
-*.nupkg
-
-## --- IDE SETTINGS ---
-# JetBrains Rider / IntelliJ
+# IDE
 .idea/
-*.sln.iml
-
-# Visual Studio
 .vs/
-*.user
-*.userosscache
-*.suo
-*.sln.docstates
 
-# VS Code
-.vscode/
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
+# Secrets / local config
+appsettings.Development.json
+appsettings.json
+*.env
 
-## --- PACKAGE MANAGEMENT ---
-# Ignore restored packages (they are downloaded via 'dotnet restore')
-**/[Pp]ackages/*
-!**/[Pp]ackages/build/
-node_modules/
-
-## --- OS GENERATED ---
+# OS
 .DS_Store
-.DS_Store?
-._*
 Thumbs.db
-ehthumbs.db
-
-## --- LOGS & TEMP ---
-*.log
-*.binlog
-.localhistory/
