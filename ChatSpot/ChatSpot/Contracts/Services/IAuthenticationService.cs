@@ -7,4 +7,5 @@ namespace ChatSpot.Contracts.Services;
 public interface IAuthenticationService
 {
     Task<BaseResponse> Register(RegisterDto registerDto);
+    Task<BaseResponse> ConfirmEmail (RegisterationConfirmationDto registerationConfirmationDto);
 }

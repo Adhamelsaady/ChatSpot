@@ -70,8 +70,44 @@ public class AuthenticationService : IAuthenticationService
         };
     }
 
-    // public async Task<bool> ConfirmEmail(RegisterationConfirmationDto registerationConfirmationDto)
-    // {
-    //     
-    // }
+    public async Task<BaseResponse> ConfirmEmail(RegisterationConfirmationDto registerationConfirmationDto)
+    {
+        var user = await _userManager.FindByEmailAsync(registerationConfirmationDto.Email);
+        if (user == null || user.EmailConfirmed)
+        {
+            return new BaseResponse()
+            {
+                IsSuccess = false,
+                Message = "User not found"
+            };
+        }
+
+        if (user.Otp != registerationConfirmationDto.Otp)
+        {
+            return new BaseResponse()
+            {
+                IsSuccess = false,
+                Message = "Invalid OTP"
+            };
+        }
+
+        if (user.OtpExpiry > DateTime.UtcNow)
+        {
+            return new BaseResponse()
+            {
+                IsSuccess = false,
+                Message = "Expired OTP"
+            };
+        }
+
+        user.EmailConfirmed = true;
+        user.Otp = null;
+        user.OtpExpiry = null;
+        await _userManager.UpdateAsync(user);
+        return new BaseResponse()
+        {
+            IsSuccess = true,
+            Message = $"User with email : {registerationConfirmationDto.Email} has been registered"
+        };
+    }
 }

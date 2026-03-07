@@ -9,18 +9,28 @@ namespace ChatSpot.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly IAuthenticationService _authenticationService;
+
     public AuthenticationController(IAuthenticationService authenticationService)
     {
         _authenticationService = authenticationService;
     }
+
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto registerDto)
     {
         if (!ModelState.IsValid)
         {
-            return  BadRequest(ModelState);
+            return BadRequest(ModelState);
         }
+
         var result = await _authenticationService.Register(registerDto);
-        return Ok(result);
+        return result.IsSuccess ? Ok(result.Message) : BadRequest(result.Message);
+    }
+
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail(RegisterationConfirmationDto registerationConfirmationDto)
+    {
+        var result = await _authenticationService.ConfirmEmail(registerationConfirmationDto);
+        return result.IsSuccess ? Ok(result.Message) : BadRequest(result.Message);
     }
 }
