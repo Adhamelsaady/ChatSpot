@@ -33,28 +33,34 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<BaseResponse> Register(RegisterDto registerDto)
     {
-        // check if the user already exists 
         var user = await _userManager.FindByEmailAsync(registerDto.Email);
-        if (user != null || user.EmailConfirmed == true)
+        if (user != null)
         {
-            return new BaseResponse()
+            if (user.EmailConfirmed ==  false)
             {
-                IsSuccess = false,
-                Message = $"User with email : {registerDto.Email}  already exists"
-            };
+                await _userManager.DeleteAsync(user);
+            }
+            else
+            {
+                return new BaseResponse()
+                {
+                    IsSuccess = false,
+                    Message = $"User with email : {registerDto.Email}  already exists"
+                };
+            }
         }
         
         var otp = _otpService.GenerateOtp();
         var userToAdd = _mapper.Map<ApplicationUser>(registerDto);
         userToAdd.Otp = otp;
         userToAdd.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
-        var result = await _userManager.CreateAsync(user , registerDto.Password);
+        var result = await _userManager.CreateAsync(userToAdd , registerDto.Password);
         if (result.Succeeded == false)
         {
             return new BaseResponse()
             {
                 IsSuccess = false,
-                Message = "Something went wrong , please try again" 
+                Message = result.Errors.First().Description
             };
         }
         await _emailService.SendEmailConfirmationOtpAsync(registerDto.Email , registerDto.UserName , otp);
