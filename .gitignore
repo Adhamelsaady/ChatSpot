@@ -5,7 +5,7 @@ obj/
 # IDE
 .idea/
 .vs/
-*.sln
+.sln
 # Secrets / local config
 appsettings.Development.json
 appsettings.json
