@@ -9,13 +9,13 @@ public class MessageDocument
     public string? Id { get; set; }
 
     [BsonElement("senderId")]
-    public string SenderId { get; set; } = string.Empty;        // → users.id (PG)
+    public string SenderId { get; set; } = string.Empty;        
 
     [BsonElement("receiverId")]
-    public string? ReceiverId { get; set; }                     // → users.id (PG) — DM only
+    public string? ReceiverId { get; set; }                     
 
     [BsonElement("groupId")]
-    public string? GroupId { get; set; }                        // → groups.id (PG) — group only
+    public string? GroupId { get; set; }                        
 
     [BsonElement("content")]
     public string Content { get; set; } = string.Empty;
@@ -26,7 +26,7 @@ public class MessageDocument
     [BsonElement("isRead")]
     public bool IsRead { get; set; } = false;
 
-    // text | image | video | audio | file
+
     [BsonElement("messageType")]
     public string MessageType { get; set; } = "text";
 
