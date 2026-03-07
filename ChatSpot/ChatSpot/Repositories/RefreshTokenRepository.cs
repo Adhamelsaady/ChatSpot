@@ -12,9 +12,11 @@ public class RefreshTokenRepository : IRefreshTokenRepository
     {
         _db = db;
     }
-    public async Task<RefreshToken> GetRefreshTokenAsync(string refreshToken)
+    public async Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken)
     {
-        return await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshToken);
+        return await _db.RefreshTokens
+                    .Include(t => t.User)
+                    .FirstOrDefaultAsync(t => t.Token == refreshToken);
     }
 
     public async Task<bool> MarkRefreshTokenAsUsedAsync(RefreshToken refreshToken)
