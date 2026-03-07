@@ -23,11 +23,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Contracts\Persistence\" />
       <Folder Include="Dtos\Outgoing\" />
       <Folder Include="Helpers\" />
       <Folder Include="Models\NoSQL\" />
-      <Folder Include="Repositories\" />
     </ItemGroup>
 
 </Project>

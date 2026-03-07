@@ -110,4 +110,6 @@ public class AuthenticationService : IAuthenticationService
             Message = $"User with email : {registerationConfirmationDto.Email} has been registered"
         };
     }
+
+    
 }

@@ -30,6 +30,10 @@ public class AuthenticationController : ControllerBase
     [HttpPost("confirm-email")]
     public async Task<IActionResult> ConfirmEmail(RegisterationConfirmationDto registerationConfirmationDto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         var result = await _authenticationService.ConfirmEmail(registerationConfirmationDto);
         return result.IsSuccess ? Ok(result.Message) : BadRequest(result.Message);
     }
