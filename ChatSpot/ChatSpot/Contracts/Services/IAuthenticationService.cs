@@ -12,5 +12,4 @@ public interface IAuthenticationService
     Task<AuthResult> Login(LoginDto loginDto);
     
     Task <AuthResult> RefreshToken(RefreshTokenDto refreshTokenDto);
-    Task go(MessageDocument doc);
 }
