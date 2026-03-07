@@ -16,6 +16,10 @@ public class AuthenticationController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto registerDto)
     {
+        if (!ModelState.IsValid)
+        {
+            return  BadRequest(ModelState);
+        }
         var result = await _authenticationService.Register(registerDto);
         return Ok(result);
     }

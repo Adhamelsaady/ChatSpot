@@ -50,9 +50,8 @@ public class AuthenticationService : IAuthenticationService
             }
         }
         
-        var otp = _otpService.GenerateOtp();
         var userToAdd = _mapper.Map<ApplicationUser>(registerDto);
-        userToAdd.Otp = otp;
+        userToAdd.Otp = _otpService.GenerateOtp();
         userToAdd.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
         var result = await _userManager.CreateAsync(userToAdd , registerDto.Password);
         if (result.Succeeded == false)
@@ -63,11 +62,16 @@ public class AuthenticationService : IAuthenticationService
                 Message = result.Errors.First().Description
             };
         }
-        await _emailService.SendEmailConfirmationOtpAsync(registerDto.Email , registerDto.UserName , otp);
+        await _emailService.SendEmailConfirmationOtpAsync(registerDto.Email , registerDto.UserName , userToAdd.Otp);
         return new BaseResponse()
         {
             IsSuccess = true,
             Message = $"Check your email : {registerDto.Email}"
         };
     }
+
+    // public async Task<bool> ConfirmEmail(RegisterationConfirmationDto registerationConfirmationDto)
+    // {
+    //     
+    // }
 }
