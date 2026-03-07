@@ -6,6 +6,7 @@ using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Dtos.Outgoing;
+using ChatSpot.Models.NoSQL;
 using ChatSpot.Models.SQL;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -22,8 +23,10 @@ public class AuthenticationService : IAuthenticationService
     private readonly IJwtTokenGeneration _jwtTokenGeneration;
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
-
+    private readonly MongoDbContext _mongoDbContext;
+    
     public AuthenticationService(
+        MongoDbContext mongoDbContext,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IOtpService otpService,
@@ -41,6 +44,7 @@ public class AuthenticationService : IAuthenticationService
         _jwtTokenGeneration = jwtTokenGeneration;
         _tokenValidationParameters = tokenValidationParameters;
         _refreshTokenRepository = refreshTokenRepository;
+        _mongoDbContext = mongoDbContext;
     }
 
     public async Task<BaseResponse> Register(RegisterDto registerDto)

@@ -1,4 +1,5 @@
 ﻿using ChatSpot.Contracts.Persistence;
+using ChatSpot.Models.NoSQL;
 using ChatSpot.Models.SQL;
 using ChatSpot.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,7 @@ public static class PersistenceConfigurations
 {
     public static void ConfigurePersistence(this IServiceCollection services)
     {
+        services.AddSingleton<MongoDbContext>();
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = false;

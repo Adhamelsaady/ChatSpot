@@ -1,5 +1,6 @@
 ﻿using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos.Ingoing;
+using ChatSpot.Models.NoSQL;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatSpot.Controllers;
@@ -59,4 +60,5 @@ public class AuthenticationController : ControllerBase
         var result = await _authenticationService.RefreshToken(refreshTokenDto);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Message);
     }
+
 }
