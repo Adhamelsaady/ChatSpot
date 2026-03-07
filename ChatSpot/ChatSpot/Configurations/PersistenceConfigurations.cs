@@ -1,4 +1,6 @@
-﻿using ChatSpot.Models.SQL;
+﻿using ChatSpot.Contracts.Persistence;
+using ChatSpot.Models.SQL;
+using ChatSpot.Repositories;
 using Microsoft.AspNetCore.Identity;
 
 namespace ChatSpot.Configurations;
@@ -22,5 +24,7 @@ public static class PersistenceConfigurations
             .AddEntityFrameworkStores<ChatSpotDbContext>()
             .AddDefaultTokenProviders();
         // todo : add the repositories when done here
+        services.AddScoped(typeof(IBaseRepository<>) , typeof(BaseRepository<>));
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
     }
 }

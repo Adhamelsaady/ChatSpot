@@ -8,4 +8,7 @@ public interface IAuthenticationService
 {
     Task<BaseResponse> Register(RegisterDto registerDto);
     Task<BaseResponse> ConfirmEmail (RegisterationConfirmationDto registerationConfirmationDto);
+    Task<AuthResult> Login(LoginDto loginDto);
+    
+    Task <AuthResult> RefreshToken(RefreshTokenDto refreshTokenDto);
 }

@@ -37,4 +37,26 @@ public class AuthenticationController : ControllerBase
         var result = await _authenticationService.ConfirmEmail(registerationConfirmationDto);
         return result.IsSuccess ? Ok(result.Message) : BadRequest(result.Message);
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginDto loginDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var result = await _authenticationService.Login(loginDto);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Message);
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> RefreshToken(RefreshTokenDto refreshTokenDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var result = await _authenticationService.RefreshToken(refreshTokenDto);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Message);
+    }
 }
