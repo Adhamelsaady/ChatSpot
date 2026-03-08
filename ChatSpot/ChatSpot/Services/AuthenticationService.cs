@@ -108,7 +108,7 @@ public class AuthenticationService : IAuthenticationService
             };
         }
 
-        if (user.OtpExpiry > DateTime.UtcNow)
+        if (user.OtpExpiry < DateTime.UtcNow)
         {
             return new BaseResponse()
             {
