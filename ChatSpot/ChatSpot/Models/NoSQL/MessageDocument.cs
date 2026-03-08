@@ -15,8 +15,11 @@ public class MessageDocument
     public string? ReceiverId { get; set; }                     
 
     [BsonElement("groupId")]
-    public string? GroupId { get; set; }                        
-
+    public string? GroupId { get; set; }        
+    
+    [BsonElement("conversationId")]
+    public string ConversationId { get; set; } = string.Empty;
+    
     [BsonElement("content")]
     public string Content { get; set; } = string.Empty;
 
