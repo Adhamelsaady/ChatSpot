@@ -40,7 +40,7 @@ public class ChatService : IChatService
         foreach (var conversation in conversations.Items)
         {
             var user = await _userRepository.GetByIdAsync(conversation.Participants.First(p => p != userId));
-            var unreadCount = conversation.UnreadCount[userId];
+            var unreadCount = conversation.UnreadCount.ContainsKey(userId) ? conversation.UnreadCount[userId] : 0;
             result.Items.Add(new ConversationToReturnDto()
             {
                 Id =  conversation.Id,
