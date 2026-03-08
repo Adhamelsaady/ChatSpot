@@ -4,9 +4,11 @@ using ChatSpot.Contracts.Persistence;
 using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Dtos.Outgoing;
+using ChatSpot.Dtos.Responses;
 using ChatSpot.Hubs;
 using ChatSpot.Models.NoSQL;
 using ChatSpot.Models.SQL;
+using ChatSpot.ResourceParameters;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatSpot.Services;
@@ -30,6 +32,12 @@ public class ChatService : IChatService
         _mapper = mapper;
         _chatHub = chatHub;
     }
+
+    // public async Task<PagedResult<ConversationToReturnDto>> GetAllConversations(BaseResourceParameter resourceParameter , string userId)
+    // {
+    //     
+    // }
+    
     public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending , string currentUser)
     {
         var receiver = await _userRepository.GetByIdAsync(messageForSending.ReceiverId);

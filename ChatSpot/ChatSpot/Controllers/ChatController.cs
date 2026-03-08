@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos.Ingoing;
+using ChatSpot.ResourceParameters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,13 @@ public class ChatController : ControllerBase
     {
         _chatService = chatService;
     }
-    
+
+    // [HttpGet]
+    // public async Task<IActionResult> GetConversation([FromQuery] BaseResourceParamemeter baseResourceParameter)
+    // {
+    //     
+    // }
+    //
     [HttpPost("send-message")]
     public async Task<IActionResult> SendMessage([FromBody] MessageForSending messageForSending)
     {
