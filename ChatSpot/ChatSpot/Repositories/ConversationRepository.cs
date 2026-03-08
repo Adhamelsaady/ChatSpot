@@ -1,5 +1,7 @@
 ﻿using ChatSpot.Contracts.Persistence;
+using ChatSpot.Dtos.Responses;
 using ChatSpot.Models.NoSQL;
+using ChatSpot.ResourceParameters;
 using MongoDB.Driver;
 
 namespace ChatSpot.Repositories;
@@ -11,6 +13,22 @@ public class ConversationRepository : IConversationRepository
     public ConversationRepository(MongoDbContext db)
     {
         _db = db;
+    }
+
+    public async Task<PagedResult<ConversationDocument>> GetAllConversations(BaseResourceParameter resourceParameter,
+        string userId)
+    {
+        var conversation =  await _db.Conversations
+            .Find(Builders<ConversationDocument>.Filter.AnyEq(c => c.Participants, userId))
+            .SortByDescending(c => c.LastUpdated)
+            .Skip((resourceParameter.PageNumber - 1) * resourceParameter.PageSize).Limit(resourceParameter.PageSize)
+            .ToListAsync();
+        return new PagedResult<ConversationDocument>()
+        {
+            Items = conversation,
+            PageNumber = resourceParameter.PageNumber,
+            PageSize = resourceParameter.PageSize
+        };
     }
 
     public async Task<ConversationDocument?> GetByParticipantsAsync(string userId1, string userId2)

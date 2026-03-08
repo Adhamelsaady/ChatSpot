@@ -13,5 +13,6 @@ public class MappingProfile : Profile
         CreateMap<RegisterDto , ApplicationUser>();
         CreateMap<MessageForSending , MessageDocument>();
         CreateMap<MessageDocument, MessageToReturnDto>();
+        CreateMap<ApplicationUser , UserDto>();
     }
 }

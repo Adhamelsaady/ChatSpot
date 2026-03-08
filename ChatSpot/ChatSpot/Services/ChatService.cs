@@ -33,10 +33,27 @@ public class ChatService : IChatService
         _chatHub = chatHub;
     }
 
-    // public async Task<PagedResult<ConversationToReturnDto>> GetAllConversations(BaseResourceParameter resourceParameter , string userId)
-    // {
-    //     
-    // }
+    public async Task<PagedResult<ConversationToReturnDto>> GetAllConversations(BaseResourceParameter resourceParameter , string userId)
+    {
+        var conversations = await _conversationRepository.GetAllConversations(resourceParameter , userId);
+        var result = new  PagedResult<ConversationToReturnDto>();
+        foreach (var conversation in conversations.Items)
+        {
+            var user = await _userRepository.GetByIdAsync(conversation.Participants.First(p => p != userId));
+            var unreadCount = conversation.UnreadCount[userId];
+            result.Items.Add(new ConversationToReturnDto()
+            {
+                Id =  conversation.Id,
+                User = _mapper.Map<UserDto>(user),
+                LastMessage = conversation.LastMessage,
+                UnreadMessagesCount =  unreadCount,
+            });
+        }
+        result.TotalCount = conversations.TotalCount;
+        result.PageSize = resourceParameter.PageSize;
+        result.PageNumber = resourceParameter.PageNumber;
+        return result;
+    }
     
     public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending , string currentUser)
     {
