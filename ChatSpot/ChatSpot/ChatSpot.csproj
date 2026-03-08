@@ -24,7 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Dtos\Outgoing\" />
       <Folder Include="Helpers\" />
     </ItemGroup>
 

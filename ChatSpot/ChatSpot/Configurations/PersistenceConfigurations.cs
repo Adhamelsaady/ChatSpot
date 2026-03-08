@@ -28,5 +28,7 @@ public static class PersistenceConfigurations
         // todo : add the repositories when done here
         services.AddScoped(typeof(IBaseRepository<>) , typeof(BaseRepository<>));
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IConversationRepository, ConversationRepository>();
     }
 }
