@@ -34,7 +34,7 @@ public class JwtTokenGeneration : IJwtTokenGeneration
         var token = new JwtSecurityToken(issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddSeconds(_configuration.GetValue<int>("Jwt:Lifetime")),
+            expires: DateTime.UtcNow.AddHours(_configuration.GetValue<int>("Jwt:Lifetime")),
             signingCredentials: creds);
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
         var refreshToken = new RefreshToken()
