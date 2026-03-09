@@ -89,7 +89,7 @@ public class ChatService : IChatService
         var messages = await _messageRepository.GetMessagesOfConversationAsync(resourceParameter, conversationId);
         PagedResult<MessageToReturnDto> messagesToReturn = new PagedResult<MessageToReturnDto>()
         {
-            Items = _mapper.Map<List<MessageToReturnDto>>(messages),
+            Items = _mapper.Map<List<MessageToReturnDto>>(messages.Items),
             TotalCount = messages.TotalCount,
             PageNumber = messages.PageNumber,
             PageSize =  messages.PageSize
