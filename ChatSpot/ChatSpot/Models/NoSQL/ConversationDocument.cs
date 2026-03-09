@@ -15,5 +15,6 @@ public class ConversationDocument
 
     public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
 
+    [BsonElement("unreadCount")]
     public Dictionary<string, int> UnreadCount { get; set; } = new();
 }

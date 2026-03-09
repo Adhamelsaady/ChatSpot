@@ -8,7 +8,7 @@ namespace ChatSpot.Contracts.Services;
 
 public interface IChatService
 {
-    Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUser);
+    Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUser , string conversationId);
 
     Task<PagedResult<ConversationToReturnDto>> GetAllConversations(BaseResourceParameter resourceParameter,
         string userId);

@@ -15,6 +15,10 @@ public class ConversationRepository : IConversationRepository
         _db = db;
     }
 
+    public async Task<ConversationDocument?> GetByIdAsync(string conversationId)
+    {
+        return await _db.Conversations.Find(c => c.Id == conversationId).FirstOrDefaultAsync();
+    }
     public async Task<PagedResult<ConversationDocument>> GetAllConversations(BaseResourceParameter resourceParameter,
         string userId)
     {
@@ -36,6 +40,7 @@ public class ConversationRepository : IConversationRepository
         var filter = Builders<ConversationDocument>.Filter.And(
             Builders<ConversationDocument>.Filter.AnyEq(c => c.Participants, userId1),
             Builders<ConversationDocument>.Filter.AnyEq(c => c.Participants, userId2));
+        Console.WriteLine("Stooooop");
         return await _db.Conversations.Find(filter).FirstOrDefaultAsync();
     }
 

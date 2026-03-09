@@ -59,14 +59,8 @@ public class ChatService : IChatService
         return result;
     }
 
-    public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUser)
+    public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUser ,string conversationId)
     {
-        var receiver = await _userRepository.GetByIdAsync(messageForSending.ReceiverId);
-        if (receiver == null)
-        {
-            return new MessageToReturnDto() { IsSuccess = false, Message = "User not found" };
-        }
-
         var messageDocument = _mapper.Map<MessageDocument>(messageForSending);
         string? replyPreview = null;
         if (!string.IsNullOrEmpty(messageForSending.ReplyToId))
@@ -75,15 +69,13 @@ public class ChatService : IChatService
             if (messageToReply.IsDeleted) replyPreview = "Deleted Message";
             else replyPreview = messageToReply.Content[..Math.Min(60, messageToReply.Content.Length)];
         }
-
-        var conversation =
-            await _conversationRepository.GetByParticipantsAsync(currentUser, messageForSending.ReceiverId);
+        
         messageDocument.ReplyToPreview = replyPreview;
         messageDocument.SenderId = currentUser;
         messageDocument.Timestamp = DateTime.UtcNow;
         await _conversationRepository.UpsertAsync(messageDocument.SenderId, messageDocument.ReceiverId,
             messageDocument.Content);
-        messageDocument.ConversationId  = conversation.Id;
+        messageDocument.ConversationId  = conversationId;
         var message = await _messageRepository.CreateMessageAsync(messageDocument);
         var result = _mapper.Map<MessageToReturnDto>(message);
         await ChatHub.SendToUserAsync(_chatHub, messageDocument.ReceiverId, "ReceiveMessage", result);
