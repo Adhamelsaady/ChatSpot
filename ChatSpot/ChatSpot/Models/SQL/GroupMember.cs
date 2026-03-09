@@ -4,7 +4,7 @@ namespace ChatSpot.Models.SQL;
 
 public class GroupMember
 {
-    [MaxLength(20)] public GroupRole Role { get; set; }
+    public GroupRole Role { get; set; }
 
     public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
 

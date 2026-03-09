@@ -14,5 +14,8 @@ public class MappingProfile : Profile
         CreateMap<MessageForSending , MessageDocument>();
         CreateMap<MessageDocument, MessageToReturnDto>();
         CreateMap<ApplicationUser , UserDto>();
+        CreateMap<GroupToCreateDto , Group>();
+        CreateMap<GroupMemberDto, GroupMember>();
+        CreateMap<Group, GroupToReturnDto>();
     }
 }
