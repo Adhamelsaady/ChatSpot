@@ -21,16 +21,8 @@ public class MongoDbContext
     private void CreateIndexes()
     {
         Messages.Indexes.CreateOne(new CreateIndexModel<MessageDocument>(
-            Builders<MessageDocument>.IndexKeys
-                .Ascending(m => m.SenderId)
-                .Ascending(m => m.ReceiverId)
-                .Descending(m => m.Timestamp)));
-
-        Messages.Indexes.CreateOne(new CreateIndexModel<MessageDocument>(
-            Builders<MessageDocument>.IndexKeys
-                .Ascending(m => m.GroupId)
-                .Descending(m => m.Timestamp)));
-
+            Builders<MessageDocument>.IndexKeys.Ascending(m => m.ConversationId)));
+        
         Conversations.Indexes.CreateOne(new CreateIndexModel<ConversationDocument>(
             Builders<ConversationDocument>.IndexKeys
                 .Ascending(c => c.Participants)));

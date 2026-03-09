@@ -9,7 +9,7 @@ namespace ChatSpot.Controllers;
 
 
 [ApiController]
-[Route("[controller]")]
+[Route("/api/[controller]")]
 [Authorize]
 public class ChatController : ControllerBase
 {
@@ -38,4 +38,5 @@ public class ChatController : ControllerBase
         if(result.IsSuccess) return Ok(result);
         else return  BadRequest(result);
     }
+    
 }
