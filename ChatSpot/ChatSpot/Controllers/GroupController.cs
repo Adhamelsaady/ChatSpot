@@ -18,7 +18,7 @@ public class GroupController : ControllerBase
         _groupService = groupService;
     }
 
-    [HttpPost("create")]
+    [HttpPost("create-group")]
     public async Task<IActionResult> CreateGroup([FromBody] GroupToCreateDto createGroupDt)
     {
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;

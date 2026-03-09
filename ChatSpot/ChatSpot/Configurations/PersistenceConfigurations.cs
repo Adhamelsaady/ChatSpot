@@ -29,6 +29,8 @@ public static class PersistenceConfigurations
         services.AddScoped(typeof(IBaseRepository<>) , typeof(BaseRepository<>));
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IGroupRepository, GroupRepository>();
         services.AddScoped<IConversationRepository, ConversationRepository>();
+        services.AddScoped<IGroupMetaDataRepository , GroupMetaDataRepository>();
     }
 }
