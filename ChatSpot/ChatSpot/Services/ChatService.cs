@@ -91,5 +91,17 @@ public class ChatService : IChatService
         result.Message = "Message sent";
         return result;
     }
-    
+    public async Task<PagedResult<MessageToReturnDto>> GetMessagesOfConversation(BaseResourceParameter resourceParameter,
+        string conversationId)
+    {
+        var messages = await _messageRepository.GetMessagesOfConversationAsync(resourceParameter, conversationId);
+        PagedResult<MessageToReturnDto> messagesToReturn = new PagedResult<MessageToReturnDto>()
+        {
+            Items = _mapper.Map<List<MessageToReturnDto>>(messages),
+            TotalCount = messages.TotalCount,
+            PageNumber = messages.PageNumber,
+            PageSize =  messages.PageSize
+        };
+        return messagesToReturn;
+    }
 }

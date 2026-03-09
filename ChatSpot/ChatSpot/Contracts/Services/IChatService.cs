@@ -12,4 +12,7 @@ public interface IChatService
 
     Task<PagedResult<ConversationToReturnDto>> GetAllConversations(BaseResourceParameter resourceParameter,
         string userId);
+
+    Task<PagedResult<MessageToReturnDto>> GetMessagesOfConversation(BaseResourceParameter resourceParameter,
+        string conversationId);
 }
