@@ -19,6 +19,12 @@ public class ChatController : ControllerBase
         _chatService = chatService;
     }
 
+    [HttpPost("create-conversation")]
+    public async Task<IActionResult> CreateConversation([FromBody] string otherId)
+    {
+        var result = await _chatService.CreateConversation(User.FindFirst(ClaimTypes.NameIdentifier)?.Value! , otherId);
+        return Ok(new {conversationId = result});
+    }
     [HttpGet]
     public async Task<IActionResult> GetConversations([FromQuery] BaseResourceParameter baseResourceParameter)
     {

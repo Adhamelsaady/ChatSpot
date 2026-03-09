@@ -10,4 +10,6 @@ public interface IConversationRepository
     Task<ConversationDocument?> GetByParticipantsAsync(string userId1, string userId2);
     Task<ConversationDocument?> GetByIdAsync(string conversationId);
     Task<PagedResult<ConversationDocument>> GetAllConversations(BaseResourceParameter resourceParameter, string userId);
+
+    Task<ConversationDocument> CreateConversation(string user1Id, string user2Id);
 }

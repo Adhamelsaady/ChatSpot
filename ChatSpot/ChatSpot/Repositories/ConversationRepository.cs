@@ -40,7 +40,6 @@ public class ConversationRepository : IConversationRepository
         var filter = Builders<ConversationDocument>.Filter.And(
             Builders<ConversationDocument>.Filter.AnyEq(c => c.Participants, userId1),
             Builders<ConversationDocument>.Filter.AnyEq(c => c.Participants, userId2));
-        Console.WriteLine("Stooooop");
         return await _db.Conversations.Find(filter).FirstOrDefaultAsync();
     }
 
@@ -67,6 +66,12 @@ public class ConversationRepository : IConversationRepository
         };
         await _db.Conversations.InsertOneAsync(conversationToReturn);
         return conversationToReturn;
+    }
+
+    public async Task<ConversationDocument> CreateConversation(string user1Id, string user2Id)
+    {
+       await _db.Conversations.InsertOneAsync(new ConversationDocument() {Participants = {user1Id, user2Id}});
+       return await GetByParticipantsAsync(user1Id, user2Id);
     }
     
 }

@@ -87,6 +87,10 @@ public class ChatService : IChatService
         string conversationId)
     {
         var messages = await _messageRepository.GetMessagesOfConversationAsync(resourceParameter, conversationId);
+        // todo : mark unread messages to read
+        // get all messages of the chat that's not read yet and the receiver is me
+        // mark them read -> with bulk update in monog
+        // reset the unreadCnt[me] to 0
         PagedResult<MessageToReturnDto> messagesToReturn = new PagedResult<MessageToReturnDto>()
         {
             Items = _mapper.Map<List<MessageToReturnDto>>(messages.Items),
@@ -95,5 +99,15 @@ public class ChatService : IChatService
             PageSize =  messages.PageSize
         };
         return messagesToReturn;
+    }
+
+    public async Task<string> CreateConversation(string user1Id, string user2Id)
+    {
+        var conv = await _conversationRepository.GetByParticipantsAsync(user1Id, user2Id);
+        if (conv == null)
+        {
+            return (await _conversationRepository.CreateConversation(user1Id, user2Id)).Id;
+        }
+        return conv.Id;
     }
 }

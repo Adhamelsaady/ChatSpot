@@ -15,4 +15,6 @@ public interface IChatService
 
     Task<PagedResult<MessageToReturnDto>> GetMessagesOfConversation(BaseResourceParameter resourceParameter,
         string conversationId);
+    
+    Task<string> CreateConversation(string user1Id, string user2Id);
 }
