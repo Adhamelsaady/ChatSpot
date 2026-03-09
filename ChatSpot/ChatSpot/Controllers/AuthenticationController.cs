@@ -61,4 +61,5 @@ public class AuthenticationController : ControllerBase
         return result.IsSuccess ? Ok(result) : BadRequest(result.Message);
     }
 
+    
 }

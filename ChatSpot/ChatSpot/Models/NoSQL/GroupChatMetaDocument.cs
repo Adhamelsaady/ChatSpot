@@ -15,7 +15,7 @@ public class GroupChatMetaDocument
 
     public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
     
+    public List<string> PinnedMessageIds { get; set; } = new();
     public Dictionary<string, int> UnreadCount { get; set; } = new();
 
-    public List<string> PinnedMessageIds { get; set; } = new();
 }
