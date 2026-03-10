@@ -40,4 +40,25 @@ public class MessageRepository : IMessageRepository
             PageSize = resourceParameter.PageSize
         };
     }
+
+    public Task<PagedResult<MessageDocument>> GetMessagesOfDocument(BaseResourceParameter resourceParameter, string groupId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<PagedResult<MessageDocument>> GetMessagesOfGroup(BaseResourceParameter resourceParameter , string groupId)
+    {
+        var messages =
+            await _db.Messages.Find(Builders<MessageDocument>.Filter.Eq(m => m.GroupId , groupId))
+                .SortByDescending(m => m.Timestamp)
+                .Skip((resourceParameter.PageNumber - 1) * resourceParameter.PageSize)
+                .Limit(resourceParameter.PageSize)
+                .ToListAsync();
+        return new PagedResult<MessageDocument>()
+        {
+            Items = messages,
+            PageNumber = resourceParameter.PageNumber,
+            PageSize = resourceParameter.PageSize
+        };
+    }
 }

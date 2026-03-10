@@ -28,11 +28,11 @@ public class GroupController : ControllerBase
     }
 
     [HttpGet("{groupId::guid}")]
-    public async Task<IActionResult> GetById([FromRoute] Guid groupId)
+    public async Task<IActionResult> GetGroup([FromQuery] BaseResourceParameter baseResourceParameter , [FromRoute] Guid groupId)
     {
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var result = await _groupService.GetGroup(groupId, currentUserId);
-        return result.IsSuccess ? Ok(result) :  BadRequest("problem");
+        var result = await _groupService.GetGroupMessages(baseResourceParameter, groupId.ToString(), currentUserId);
+        return Ok(result);
     }
 
     [HttpPost("create-group")]

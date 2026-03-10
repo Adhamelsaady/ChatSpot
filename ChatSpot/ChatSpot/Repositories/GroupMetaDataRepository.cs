@@ -31,4 +31,14 @@ public class GroupMetaDataRepository : IGroupMetaDataRepository
         return await _db.GroupChatMeta
             .Find(m => groupIds.Contains(m.GroupId)).ToListAsync();
     }
+    
+    public async Task MarkGroupMessagesAsRead(string groupId , string userId)
+    {
+        var meta = await GetByGroupIdAsync(groupId);
+        var lastMessageId = meta.LastMessageId;
+        var update = Builders<GroupChatMetaDocument>.Update
+            .Set(c => c.UnreadCount[userId], 0)
+            .Set(c => c.LastReadMessageId, lastMessageId);
+        await  _db.GroupChatMeta.UpdateOneAsync(c => c.Id == meta.Id, update);
+    }
 }

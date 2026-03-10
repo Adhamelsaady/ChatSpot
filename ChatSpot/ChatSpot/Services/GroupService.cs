@@ -5,6 +5,7 @@ using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Dtos.Outgoing;
 using ChatSpot.Dtos.Responses;
 using ChatSpot.Hubs;
+using ChatSpot.Models.NoSQL;
 using ChatSpot.Models.SQL;
 using ChatSpot.ResourceParameters;
 using Microsoft.AspNetCore.SignalR;
@@ -17,14 +18,15 @@ public class GroupService : IGroupService
     private readonly IMapper _mapper;
     private readonly IHubContext<ChatHub> _hub;
     private readonly IGroupMetaDataRepository _groupMetaDataRepository;
-
+    private readonly IMessageRepository _messageRepository;
     public GroupService(IGroupRepository groupRepository, IMapper mapper, IHubContext<ChatHub> hub,
-        IGroupMetaDataRepository groupMetaDataRepository)
+        IGroupMetaDataRepository groupMetaDataRepository , IMessageRepository messageRepository)
     {
         _groupRepository = groupRepository;
         _mapper = mapper;
         _hub = hub;
         _groupMetaDataRepository = groupMetaDataRepository;
+        _messageRepository = messageRepository;
     }
 
     public async Task<GroupToReturnDto> CreateGroup(GroupToCreateDto createGroupDto, string currentUserId)
@@ -102,19 +104,19 @@ public class GroupService : IGroupService
         
     }
 
-    public async Task<GroupToReturnDto> GetGroup(Guid groupId, string currentUserId)
+    public async Task<PagedResult<MessageToReturnDto>> GetGroupMessages(BaseResourceParameter baseResourceParameter,
+        string groupId , string  currentUserId)
     {
-        if (!await _groupRepository.UserInGroupAsync(groupId, currentUserId))
+        var messages = await _messageRepository.GetMessagesOfGroup(baseResourceParameter, groupId);
+        await _groupMetaDataRepository.MarkGroupMessagesAsRead(groupId, currentUserId);
+        PagedResult<MessageToReturnDto> messagesToReturn = new PagedResult<MessageToReturnDto>()
         {
-            return new GroupToReturnDto()
-            {
-                IsSuccess = false,
-                Message = "Group not found"
-            };
-        }
-        var groupToReturnDto = _mapper.Map<GroupToReturnDto>(await _groupRepository.GetByIdAsync(groupId));
-        groupToReturnDto.IsSuccess = true;
-        return groupToReturnDto;
+            Items = _mapper.Map<List<MessageToReturnDto>>(messages.Items),
+            TotalCount = messages.TotalCount,
+            PageNumber = messages.PageNumber,
+            PageSize =  messages.PageSize
+        };
+        return messagesToReturn;
     }
 
 }
