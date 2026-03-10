@@ -103,4 +103,19 @@ public class GroupService : IGroupService
         
     }
 
+    public async Task<GroupToReturnDto> GetGroup(Guid groupId, string currentUserId)
+    {
+        if (!await _groupRepository.UserInGroupAsync(groupId, currentUserId))
+        {
+            return new GroupToReturnDto()
+            {
+                IsSuccess = false,
+                Message = "Group not found"
+            };
+        }
+        var groupToReturnDto = _mapper.Map<GroupToReturnDto>(await _groupRepository.GetByIdAsync(groupId));
+        groupToReturnDto.IsSuccess = true;
+        return groupToReturnDto;
+    }
+
 }

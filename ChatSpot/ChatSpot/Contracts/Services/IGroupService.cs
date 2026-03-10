@@ -10,4 +10,5 @@ public interface IGroupService
     Task<GroupToReturnDto> CreateGroup(GroupToCreateDto createGroupDto, string currentUserId);
     Task<GroupToReturnDto> AddMembersToGroup(Guid groupId , GroupMemberToAddDto groupMemberToAddDto, string currentUserId);
     Task<PagedResult<GroupToReturnDto>> GetMyGroups(BaseResourceParameter baseResourceParameter , string currentUserId);
+    Task<GroupToReturnDto> GetGroup(Guid groupId, string currentUserId);
 }

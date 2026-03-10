@@ -15,6 +15,10 @@ public class GroupRepository : IGroupRepository
         _db = dbContext;
     }
 
+    public async Task<bool> UserInGroupAsync(Guid groupId, string userId)
+    {
+        return await _db.GroupMembers.AnyAsync(m => m.GroupId == groupId && m.UserId == userId);
+    }
     public async Task<Group?> GetByIdAsync(Guid id)
     {
         return await _db.Groups.FindAsync(id);

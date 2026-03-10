@@ -6,6 +6,7 @@ namespace ChatSpot.Contracts.Persistence;
 
 public interface IGroupRepository
 {
+    Task<bool> UserInGroupAsync(Guid groupId, string userId);
     Task<Group?> GetByIdAsync(Guid id);
     Task<Group?> GetByIdWithMembersAsync(Guid id);
     Task<PagedResult<Group>> GetUserGroupsAsync(BaseResourceParameter baseResourceParameter , string userId);

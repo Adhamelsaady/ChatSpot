@@ -2,6 +2,7 @@
 using ChatSpot.Contracts.Persistence;
 using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos.Ingoing;
+using ChatSpot.ResourceParameters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,22 @@ public class GroupController : ControllerBase
     public  GroupController(IGroupService groupService)
     {
         _groupService = groupService;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetMyGroups([FromQuery] BaseResourceParameter baseResourceParameter)
+    {
+        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var result = await _groupService.GetMyGroups(baseResourceParameter, currentUserId);
+        return Ok(result);
+    }
+
+    [HttpGet("{groupId::guid}")]
+    public async Task<IActionResult> GetById([FromRoute] Guid groupId)
+    {
+        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var result = await _groupService.GetGroup(groupId, currentUserId);
+        return result.IsSuccess ? Ok(result) :  BadRequest("problem");
     }
 
     [HttpPost("create-group")]
