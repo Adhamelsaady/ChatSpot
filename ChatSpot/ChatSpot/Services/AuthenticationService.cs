@@ -24,7 +24,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly MongoDbContext _mongoDbContext;
-    
+
     public AuthenticationService(
         MongoDbContext mongoDbContext,
         UserManager<ApplicationUser> userManager,
@@ -33,7 +33,7 @@ public class AuthenticationService : IAuthenticationService
         IMapper mapper,
         IEmailService emailService,
         IJwtTokenGeneration jwtTokenGeneration,
-        TokenValidationParameters tokenValidationParameters ,
+        TokenValidationParameters tokenValidationParameters,
         IRefreshTokenRepository refreshTokenRepository)
     {
         _userManager = userManager;
@@ -159,6 +159,7 @@ public class AuthenticationService : IAuthenticationService
     public async Task<AuthResult> RefreshToken(RefreshTokenDto refreshTokenDto)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
+        _tokenValidationParameters.ValidateLifetime = false;
         var principal =
             tokenHandler.ValidateToken(refreshTokenDto.Token, _tokenValidationParameters, out var validatedToken);
         if (validatedToken is JwtSecurityToken jwtSecurityToken)
@@ -167,7 +168,10 @@ public class AuthenticationService : IAuthenticationService
                 StringComparison.CurrentCultureIgnoreCase);
             if (!result)
             {
-                return null;
+                return new AuthResult()
+                {
+                    IsSuccess = false, Message = "The Token Is Not Expired"
+                };
             }
         }
 
@@ -190,7 +194,7 @@ public class AuthenticationService : IAuthenticationService
         {
             return new AuthResult()
             {
-                IsSuccess = false, Message = "Invalid Refresh Tokennnn"
+                IsSuccess = false, Message = "Invalid Refresh Token"
             };
         }
 

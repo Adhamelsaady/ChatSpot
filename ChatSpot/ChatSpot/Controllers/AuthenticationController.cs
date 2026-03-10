@@ -1,7 +1,10 @@
 ﻿using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Models.NoSQL;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ChatSpot.Controllers;
 
@@ -10,10 +13,12 @@ namespace ChatSpot.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly IAuthenticationService _authenticationService;
+    private readonly TokenValidationParameters _tokenValidationParameters;
 
-    public AuthenticationController(IAuthenticationService authenticationService)
+    public AuthenticationController(IAuthenticationService authenticationService , TokenValidationParameters tokenValidationParameters)
     {
         _authenticationService = authenticationService;
+        _tokenValidationParameters = tokenValidationParameters;
     }
 
     [HttpPost("register")]
@@ -53,6 +58,11 @@ public class AuthenticationController : ControllerBase
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken(RefreshTokenDto refreshTokenDto)
     {
+        var jwtOptions = HttpContext.RequestServices
+            .GetRequiredService<IOptionsMonitor<JwtBearerOptions>>()
+            .Get(JwtBearerDefaults.AuthenticationScheme);
+        var validationParameters = jwtOptions.TokenValidationParameters.Clone();
+        validationParameters.ValidateLifetime = false;
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
