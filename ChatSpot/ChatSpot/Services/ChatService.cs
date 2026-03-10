@@ -77,7 +77,7 @@ public class ChatService : IChatService
             messageDocument.Content);
         messageDocument.ConversationId  = conversationId;
         var message = await _messageRepository.CreateMessageAsync(messageDocument);
-        await _conversationRepository.SetLastMessage(conversationId ,  message.Id);
+        await _conversationRepository.UpdateLastMessage(conversationId ,  message.Id);
         var result = _mapper.Map<MessageToReturnDto>(message);
         result.IsSuccess = true;
         result.Message = "Message sent";

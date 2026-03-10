@@ -44,7 +44,7 @@ public class ConversationRepository : IConversationRepository
         return await _db.Conversations.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<ConversationDocument> SetLastMessage(string conversationId, string messageId)
+    public async Task<ConversationDocument> UpdateLastMessage(string conversationId, string messageId)
     {
         var conversation = await GetByIdAsync(conversationId);
         var update = Builders<ConversationDocument>.Update.Set(c => c.LastMessageId, messageId);
@@ -56,11 +56,13 @@ public class ConversationRepository : IConversationRepository
         var conversation = await GetByIdAsync(conversationId);
         if (conversation != null)
         {
+            
             var update = Builders<ConversationDocument>.Update
                 .Set(c => c.LastMessage, messageContent)
                 .Set(c => c.LastUpdated, DateTime.UtcNow)
                 .Set(c => c.LastMessage , messageContent)
                 .Inc($"unreadCount.{recipientId}", 1);
+            
             await _db.Conversations.UpdateOneAsync(c => c.Id == conversation.Id, update);
             return conversation;
         }
@@ -91,5 +93,6 @@ public class ConversationRepository : IConversationRepository
             .Set(c => c.LastReadMessageId, lastMessageId);
         await  _db.Conversations.UpdateOneAsync(c => c.Id == conversation.Id, update);
     }
+
     
 }

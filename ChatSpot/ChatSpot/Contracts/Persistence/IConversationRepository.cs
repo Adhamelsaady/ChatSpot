@@ -13,6 +13,6 @@ public interface IConversationRepository
 
     Task<ConversationDocument> CreateConversation(string user1Id, string user2Id);
 
-    Task<ConversationDocument> SetLastMessage(string conversationId , string messageId);
+    Task<ConversationDocument> UpdateLastMessage(string conversationId , string messageId);
     Task MarkConversationAsRead(string conversationId, string userId);
 }

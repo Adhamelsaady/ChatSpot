@@ -41,4 +41,48 @@ public class GroupMetaDataRepository : IGroupMetaDataRepository
             .Set(c => c.LastReadMessageId, lastMessageId);
         await  _db.GroupChatMeta.UpdateOneAsync(c => c.Id == meta.Id, update);
     }
+
+    public async Task<GroupChatMetaDocument> UpsertAsync(string groupId , string messageContent , string userId)
+    {
+        var meta = await GetByGroupIdAsync(groupId);
+        if (meta != null)
+        {
+            var update = Builders<GroupChatMetaDocument>.Update
+                .Set(c => c.LastMessage, messageContent)
+                .Set(c => c.LastUpdated, DateTime.UtcNow)
+                .Set(c => c.LastMessage , messageContent);
+            await _db.GroupChatMeta.UpdateOneAsync(c => c.Id == meta.Id, update);
+            return meta;
+        }
+
+        var metaToReturn = new GroupChatMetaDocument()
+        {
+            LastMessageId = messageContent,
+            LastUpdated = DateTime.UtcNow,
+            LastMessage = messageContent,
+        };
+        return metaToReturn;
+    }
+    
+    public async Task IncrementUnreadAsync(string groupId, List<string> exceptUserIds)
+    {
+        var meta = await GetByGroupIdAsync(groupId);
+        if (meta == null) return;
+
+        var filter = Builders<GroupChatMetaDocument>.Filter.Eq(g => g.GroupId, groupId);
+        var updates = exceptUserIds.Select(uid =>
+            Builders<GroupChatMetaDocument>.Update.Inc($"unreadCount.{uid}", 1)).ToList();
+
+        if (updates.Any())
+            await _db.GroupChatMeta.UpdateOneAsync(filter,
+                Builders<GroupChatMetaDocument>.Update.Combine(updates));
+    }
+
+    public async Task<GroupChatMetaDocument> UpdateLastMessage(string groupId, string messageId)
+    {
+        var meta = await GetByGroupIdAsync (groupId);
+        var update = Builders<GroupChatMetaDocument>.Update.Set(c => c.LastMessageId, messageId);
+        await _db.GroupChatMeta.UpdateOneAsync(c => c.Id == groupId, update);
+        return meta;
+    }
 }

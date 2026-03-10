@@ -8,6 +8,7 @@ using ChatSpot.Hubs;
 using ChatSpot.Models.NoSQL;
 using ChatSpot.Models.SQL;
 using ChatSpot.ResourceParameters;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatSpot.Services;
@@ -66,7 +67,6 @@ public class GroupService : IGroupService
         var group = await _groupRepository.GetByIdWithMembersAsync(groupId);
         var meta = await _groupMetaDataRepository.GetByGroupIdAsync(groupId.ToString());
         var groupToReturn = _mapper.Map<GroupToReturnDto>(group);
-       
         
         groupToReturn.IsSuccess = true;
         return groupToReturn;
@@ -104,6 +104,35 @@ public class GroupService : IGroupService
         
     }
 
+    public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending , string currentUserId , Guid groupId)
+    {
+        var messageDocument = _mapper.Map<MessageDocument>(messageForSending);
+        
+        string? replyPreview = null;
+        if (!string.IsNullOrEmpty(messageForSending.ReplyToId))
+        {
+            var messageToReply = await _messageRepository.GetMessageByIdAsync(messageForSending.ReplyToId);
+            if (messageToReply.IsDeleted) replyPreview = "Deleted Message";
+            else replyPreview = messageToReply.Content[..Math.Min(60, messageToReply.Content.Length)];
+        }
+        messageDocument.GroupId = groupId.ToString();
+        messageDocument.ReplyToPreview = replyPreview;
+        messageDocument.SenderId = currentUserId;
+        messageDocument.Timestamp = DateTime.UtcNow;
+        var group = await _groupRepository.GetByIdWithMembersAsync(groupId);
+        await _groupMetaDataRepository.UpsertAsync(groupId.ToString() ,  messageDocument.Content , currentUserId);
+        var usersToUpdate = group.Members
+            .Select(u => u.UserId)
+            .Where(uid => uid != currentUserId)
+            .ToList();
+        await _groupMetaDataRepository.IncrementUnreadAsync(groupId.ToString(),usersToUpdate);
+        var message = await _messageRepository.CreateMessageAsync(messageDocument);
+        await _groupMetaDataRepository.UpdateLastMessage(message.GroupId, message.Id);
+        var result = _mapper.Map<MessageToReturnDto>(message);
+        result.IsSuccess = true;
+        result.Message = "Message sent";
+        return result;
+    }
     public async Task<PagedResult<MessageToReturnDto>> GetGroupMessages(BaseResourceParameter baseResourceParameter,
         string groupId , string  currentUserId)
     {
