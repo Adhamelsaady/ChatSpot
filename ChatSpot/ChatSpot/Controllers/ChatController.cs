@@ -22,32 +22,32 @@ public class ChatController : ControllerBase
     [HttpPost("create-conversation")]
     public async Task<IActionResult> CreateConversation([FromBody] CreateConversationDto createConversationDto)
     {
-        var result = await _chatService.CreateConversation(User.FindFirst(ClaimTypes.NameIdentifier)?.Value! , createConversationDto.OtherUserId);
+        var result = await _chatService.CreateConversationAsync(User.FindFirst(ClaimTypes.NameIdentifier)?.Value! , createConversationDto.OtherUserId);
         return Ok(new {conversationId = result});
     }
     [HttpGet]
     public async Task<IActionResult> GetConversations([FromQuery] BaseResourceParameter baseResourceParameter)
     {
-        var result = await _chatService.GetAllConversations(baseResourceParameter , User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        var result = await _chatService.GetAllConversationsAsync(baseResourceParameter , User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         return Ok(result);
     }
     
     [HttpGet("{conversationId}")]
     public async Task<IActionResult> GetMessagesOfConversation([FromQuery] BaseResourceParameter baseResourceParameter, [FromRoute]string conversationId)
     {
-        var result = await _chatService.GetMessagesOfConversation(baseResourceParameter, conversationId , User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        var result = await _chatService.GetMessagesOfConversationAsync(baseResourceParameter, conversationId , User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         return Ok(result);
     }
     
     [HttpPost("{conversationId}/send-message")]
     public async Task<IActionResult> SendMessage([FromBody] MessageForSending messageForSending , [FromRoute] string conversationId)
     {
-        if (!ModelState.IsValid || string.IsNullOrEmpty(messageForSending.ReceiverId))
+        if (!ModelState.IsValid)
         {
             return  BadRequest();
         }
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-        var result =await _chatService.SendMessage(messageForSending , currentUserId , conversationId);
+        var result =await _chatService.SendMessageAsync(messageForSending , currentUserId , conversationId);
         if(result.IsSuccess) return Ok(result);
         else return  BadRequest(result);
     }

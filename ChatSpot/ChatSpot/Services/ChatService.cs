@@ -35,7 +35,7 @@ public class ChatService : IChatService
     }
 
 
-    public async Task<PagedResult<ConversationToReturnDto>> GetAllConversations(BaseResourceParameter resourceParameter,
+    public async Task<PagedResult<ConversationToReturnDto>> GetAllConversationsAsync(BaseResourceParameter resourceParameter,
         string userId)
     {
         var conversations = await _conversationRepository.GetAllConversations(resourceParameter, userId);
@@ -59,7 +59,7 @@ public class ChatService : IChatService
         return result;
     }
 
-    public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUser ,string conversationId)
+    public async Task<MessageToReturnDto> SendMessageAsync(MessageForSending messageForSending, string currentUser ,string conversationId)
     {
         var messageDocument = _mapper.Map<MessageDocument>(messageForSending);
         string? replyPreview = null;
@@ -69,7 +69,7 @@ public class ChatService : IChatService
             if (messageToReply.IsDeleted) replyPreview = "Deleted Message";
             else replyPreview = messageToReply.Content[..Math.Min(60, messageToReply.Content.Length)];
         }
-        
+        messageDocument.ReceiverId = await GetReceiverIdAsync(conversationId, currentUser);
         messageDocument.ReplyToPreview = replyPreview;
         messageDocument.SenderId = currentUser;
         messageDocument.Timestamp = DateTime.UtcNow;
@@ -83,7 +83,7 @@ public class ChatService : IChatService
         result.Message = "Message sent";
         return result;
     }
-    public async Task<PagedResult<MessageToReturnDto>> GetMessagesOfConversation(BaseResourceParameter resourceParameter,
+    public async Task<PagedResult<MessageToReturnDto>> GetMessagesOfConversationAsync(BaseResourceParameter resourceParameter,
         string conversationId , string userId)
     {
         var messages = await _messageRepository.GetMessagesOfConversationAsync(resourceParameter, conversationId);
@@ -98,7 +98,7 @@ public class ChatService : IChatService
         return messagesToReturn;
     }
 
-    public async Task<string> CreateConversation(string user1Id, string user2Id)
+    public async Task<string> CreateConversationAsync(string user1Id, string user2Id)
     {
         var conv = await _conversationRepository.GetByParticipantsAsync(user1Id, user2Id);
         if (conv == null)
@@ -106,5 +106,11 @@ public class ChatService : IChatService
             return (await _conversationRepository.CreateConversation(user1Id, user2Id)).Id;
         }
         return conv.Id;
+    }
+
+    private async Task<string> GetReceiverIdAsync(string conversationId, string userId)
+    {
+        var conversation = await _conversationRepository.GetByIdAsync(conversationId);
+        return (conversation.Participants[0] == userId ? conversation.Participants[1] : conversation.Participants[0]);
     }
 }
