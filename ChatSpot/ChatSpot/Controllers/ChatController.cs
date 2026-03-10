@@ -31,7 +31,7 @@ public class ChatController : ControllerBase
         var result = await _chatService.GetAllConversations(baseResourceParameter , User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         return Ok(result);
     }
-
+    
     [HttpGet("{conversationId}")]
     public async Task<IActionResult> GetMessagesOfConversation([FromQuery] BaseResourceParameter baseResourceParameter, [FromRoute]string conversationId)
     {
@@ -51,6 +51,7 @@ public class ChatController : ControllerBase
         if(result.IsSuccess) return Ok(result);
         else return  BadRequest(result);
     }
+    
     
     
 }

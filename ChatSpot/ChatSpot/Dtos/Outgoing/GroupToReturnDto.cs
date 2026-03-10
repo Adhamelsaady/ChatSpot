@@ -8,5 +8,6 @@ public class GroupToReturnDto : BaseResponse
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime LastUpdateTime { get; set; } = DateTime.Now;
     public string LastMessage { get; set; } = string.Empty;
+    public int UnreadCount { get; set; } = 0;
     public List<GroupMemberDto> GroupMemberDtos { get; set; } = new List<GroupMemberDto>();
 }

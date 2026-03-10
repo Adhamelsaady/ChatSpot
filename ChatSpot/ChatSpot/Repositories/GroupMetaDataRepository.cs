@@ -23,4 +23,12 @@ public class GroupMetaDataRepository : IGroupMetaDataRepository
         await _db.GroupChatMeta.InsertOneAsync(meta);
         return meta;
     }
+    public async Task<IList<GroupChatMetaDocument>> GetByGroupIdsAsync(IEnumerable<string> groupIds)
+    {
+        if (groupIds == null || !groupIds.Any())
+            return new List<GroupChatMetaDocument>();
+        
+        return await _db.GroupChatMeta
+            .Find(m => groupIds.Contains(m.GroupId)).ToListAsync();
+    }
 }

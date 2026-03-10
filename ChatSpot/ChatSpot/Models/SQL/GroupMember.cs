@@ -8,7 +8,7 @@ public class GroupMember
 
     public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
 
-    public Guid GroupId { get; set; } = Guid.NewGuid();
+    public Guid GroupId { get; set; };
     public string UserId { get; set; } = string.Empty;
     public Group Group { get; set; } = null!;
     public ApplicationUser User { get; set; } = null!;
