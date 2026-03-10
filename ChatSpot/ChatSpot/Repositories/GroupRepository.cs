@@ -1,5 +1,7 @@
 ﻿using ChatSpot.Contracts.Persistence;
+using ChatSpot.Dtos.Responses;
 using ChatSpot.Models.SQL;
+using ChatSpot.ResourceParameters;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatSpot.Repositories;
@@ -7,13 +9,14 @@ namespace ChatSpot.Repositories;
 public class GroupRepository : IGroupRepository
 {
     private readonly ChatSpotDbContext _db;
+
     public GroupRepository(ChatSpotDbContext dbContext)
     {
         _db = dbContext;
     }
 
     public async Task<Group?> GetByIdAsync(Guid id)
-    { 
+    {
         return await _db.Groups.FindAsync(id);
     }
 
@@ -24,15 +27,33 @@ public class GroupRepository : IGroupRepository
             .FirstOrDefaultAsync(g => g.GroupId == id);
     }
 
-    public async Task<List<Group>> GetUserGroupsAsync(string userId)
+    public async Task<PagedResult<Group>> GetUserGroupsAsync(BaseResourceParameter baseResourceParameter, string userId)
     {
-        return await _db.Groups
+        var collection = _db.Groups
             .Include(g => g.Members)
-            .ThenInclude(m => m.User)
-            .Where(g => g.Members.Any(m => m.UserId == userId))
-            .OrderByDescending(g => g.CreatedAt)
+            .Where(g => g.Members.Any(p => p.UserId == userId))
+            .AsQueryable();
+        if (!string.IsNullOrWhiteSpace(baseResourceParameter.SearchQuery))
+        {
+            var search = baseResourceParameter.SearchQuery.Trim().ToLower();
+            collection = collection.Where(g => g.Name.ToLower().Contains(search)
+                                               || (g.Description != null && g.Description.ToLower().Contains(search)));
+        }
+        var totalCount = await collection.CountAsync();
+        var items = await collection
+            .OrderBy(g => g.Name) 
+            .Skip((baseResourceParameter.PageNumber - 1) * baseResourceParameter.PageSize)
+            .Take(baseResourceParameter.PageSize)
             .ToListAsync();
+        return new PagedResult<Group>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = baseResourceParameter.PageNumber,
+            PageSize = baseResourceParameter.PageSize
+        };
     }
+
     public async Task<Group> CreateAsync(Group group, List<GroupMember> members)
     {
         _db.Groups.Add(group);
@@ -40,13 +61,14 @@ public class GroupRepository : IGroupRepository
         await _db.SaveChangesAsync();
         return group;
     }
+
     public async Task UpdateAsync(Group group)
     {
         _db.Groups.Update(group);
         await _db.SaveChangesAsync();
     }
-    
-    
+
+
     public async Task<bool> AddMembersAsync(Guid groupId, List<string> userIds, string requesterId)
     {
         var requester = await GetMemberAsync(groupId, requesterId);
@@ -68,21 +90,21 @@ public class GroupRepository : IGroupRepository
         await _db.SaveChangesAsync();
         return true;
     }
-    
+
     public async Task<bool> RemoveMemberAsync(Guid groupId, string userId, string requesterId)
     {
-
         if (userId != requesterId)
         {
             var requester = await GetMemberAsync(groupId, requesterId);
             if (requester == null || requester.Role == GroupRole.member) return false;
         }
+
         await _db.GroupMembers
             .Where(m => m.GroupId == groupId && m.UserId == userId)
             .ExecuteDeleteAsync();
         return true;
     }
-    
+
     public async Task<bool> UpdateMemberRoleAsync(Guid groupId, string userId, GroupRole role, string requesterId)
     {
         var requester = await GetMemberAsync(groupId, requesterId);
@@ -97,7 +119,7 @@ public class GroupRepository : IGroupRepository
 
     public async Task<GroupMember?> GetMemberAsync(Guid groupId, string userId)
     {
-       return await _db.GroupMembers
+        return await _db.GroupMembers
             .FirstOrDefaultAsync(m => m.GroupId == groupId && m.UserId == userId);
     }
 }
