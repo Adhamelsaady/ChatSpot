@@ -20,9 +20,9 @@ public class ChatController : ControllerBase
     }
 
     [HttpPost("create-conversation")]
-    public async Task<IActionResult> CreateConversation([FromBody] string otherId)
+    public async Task<IActionResult> CreateConversation([FromBody] CreateConversationDto createConversationDto)
     {
-        var result = await _chatService.CreateConversation(User.FindFirst(ClaimTypes.NameIdentifier)?.Value! , otherId);
+        var result = await _chatService.CreateConversation(User.FindFirst(ClaimTypes.NameIdentifier)?.Value! , createConversationDto.OtherUserId);
         return Ok(new {conversationId = result});
     }
     [HttpGet]
