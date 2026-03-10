@@ -73,24 +73,21 @@ public class ChatService : IChatService
         messageDocument.ReplyToPreview = replyPreview;
         messageDocument.SenderId = currentUser;
         messageDocument.Timestamp = DateTime.UtcNow;
-        await _conversationRepository.UpsertAsync(messageDocument.SenderId, messageDocument.ReceiverId,
+        await _conversationRepository.UpsertAsync(conversationId , messageDocument.SenderId, messageDocument.ReceiverId,
             messageDocument.Content);
         messageDocument.ConversationId  = conversationId;
         var message = await _messageRepository.CreateMessageAsync(messageDocument);
+        await _conversationRepository.SetLastMessage(conversationId ,  message.Id);
         var result = _mapper.Map<MessageToReturnDto>(message);
-        await ChatHub.SendToUserAsync(_chatHub, messageDocument.ReceiverId, "ReceiveMessage", result);
         result.IsSuccess = true;
         result.Message = "Message sent";
         return result;
     }
     public async Task<PagedResult<MessageToReturnDto>> GetMessagesOfConversation(BaseResourceParameter resourceParameter,
-        string conversationId)
+        string conversationId , string userId)
     {
         var messages = await _messageRepository.GetMessagesOfConversationAsync(resourceParameter, conversationId);
-        // todo : mark unread messages to read
-        // get all messages of the chat that's not read yet and the receiver is me
-        // mark them read -> with bulk update in monog
-        // reset the unreadCnt[me] to 0
+        await _conversationRepository.MarkConversationAsRead(conversationId, userId);
         PagedResult<MessageToReturnDto> messagesToReturn = new PagedResult<MessageToReturnDto>()
         {
             Items = _mapper.Map<List<MessageToReturnDto>>(messages.Items),

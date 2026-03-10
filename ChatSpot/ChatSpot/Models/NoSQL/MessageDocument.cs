@@ -25,11 +25,7 @@ public class MessageDocument
 
     [BsonElement("timestamp")]
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-
-    [BsonElement("isRead")]
-    public bool IsRead { get; set; } = false;
-
-
+    
     [BsonElement("messageType")]
     public string MessageType { get; set; } = "text";
 

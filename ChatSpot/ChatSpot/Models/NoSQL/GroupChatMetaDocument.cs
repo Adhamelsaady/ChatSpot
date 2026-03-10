@@ -12,6 +12,8 @@ public class GroupChatMetaDocument
     public string GroupId { get; set; } = string.Empty;
 
     public string LastMessage { get; set; } = string.Empty;
+    
+    public string LastReadMessageId { get; set; } = string.Empty;
 
     public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
     

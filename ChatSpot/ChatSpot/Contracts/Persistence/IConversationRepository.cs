@@ -6,10 +6,13 @@ namespace ChatSpot.Contracts.Persistence;
 
 public interface IConversationRepository
 {
-    Task<ConversationDocument> UpsertAsync(string senderId , string recipientId, string messageContent);
+    Task<ConversationDocument> UpsertAsync(string conversationId , string senderId , string recipientId, string messageContent);
     Task<ConversationDocument?> GetByParticipantsAsync(string userId1, string userId2);
     Task<ConversationDocument?> GetByIdAsync(string conversationId);
     Task<PagedResult<ConversationDocument>> GetAllConversations(BaseResourceParameter resourceParameter, string userId);
 
     Task<ConversationDocument> CreateConversation(string user1Id, string user2Id);
+
+    Task<ConversationDocument> SetLastMessage(string conversationId , string messageId);
+    Task MarkConversationAsRead(string conversationId, string userId);
 }

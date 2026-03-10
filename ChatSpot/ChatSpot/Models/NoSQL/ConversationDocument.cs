@@ -12,6 +12,10 @@ public class ConversationDocument
     public List<string> Participants { get; set; } = new();
 
     public string LastMessage { get; set; } = string.Empty;
+    
+    public string LastReadMessageId { get; set; } = string.Empty;
+    
+    public string LastMessageId { get; set; } = string.Empty;
 
     public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
 

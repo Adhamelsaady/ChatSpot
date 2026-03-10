@@ -17,6 +17,7 @@ public class ConversationRepository : IConversationRepository
 
     public async Task<ConversationDocument?> GetByIdAsync(string conversationId)
     {
+        Console.WriteLine(conversationId);
         return await _db.Conversations.Find(c => c.Id == conversationId).FirstOrDefaultAsync();
     }
     public async Task<PagedResult<ConversationDocument>> GetAllConversations(BaseResourceParameter resourceParameter,
@@ -43,18 +44,25 @@ public class ConversationRepository : IConversationRepository
         return await _db.Conversations.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<ConversationDocument> UpsertAsync(string senderId, string recipientId, string messageContent)
+    public async Task<ConversationDocument> SetLastMessage(string conversationId, string messageId)
     {
-        var existing = await GetByParticipantsAsync(senderId, recipientId);
-        if (existing != null)
+        var conversation = await GetByIdAsync(conversationId);
+        var update = Builders<ConversationDocument>.Update.Set(c => c.LastMessageId, messageId);
+        await _db.Conversations.UpdateOneAsync(c => c.Id == conversationId, update);
+        return conversation;
+    }
+    public async Task<ConversationDocument> UpsertAsync(string conversationId , string senderId, string recipientId, string messageContent)
+    {
+        var conversation = await GetByIdAsync(conversationId);
+        if (conversation != null)
         {
             var update = Builders<ConversationDocument>.Update
                 .Set(c => c.LastMessage, messageContent)
                 .Set(c => c.LastUpdated, DateTime.UtcNow)
+                .Set(c => c.LastMessage , messageContent)
                 .Inc($"unreadCount.{recipientId}", 1);
-            await _db.Conversations.UpdateOneAsync(c => c.Id == existing.Id, update);
-            existing.LastMessage = messageContent;
-            return existing;
+            await _db.Conversations.UpdateOneAsync(c => c.Id == conversation.Id, update);
+            return conversation;
         }
 
         var conversationToReturn = new ConversationDocument()
@@ -68,10 +76,20 @@ public class ConversationRepository : IConversationRepository
         return conversationToReturn;
     }
 
-    public async Task<ConversationDocument> CreateConversation(string user1Id, string user2Id)
+    public async Task<ConversationDocument?> CreateConversation(string user1Id, string user2Id)
     {
        await _db.Conversations.InsertOneAsync(new ConversationDocument() {Participants = {user1Id, user2Id}});
        return await GetByParticipantsAsync(user1Id, user2Id);
+    }
+
+    public async Task MarkConversationAsRead(string conversationId , string userId)
+    {
+        var conversation = await GetByIdAsync(conversationId);
+        var lastMessageId = conversation.LastMessageId;
+        var update = Builders<ConversationDocument>.Update
+            .Set(c => c.UnreadCount[userId], 0)
+            .Set(c => c.LastReadMessageId, lastMessageId);
+        await  _db.Conversations.UpdateOneAsync(c => c.Id == conversation.Id, update);
     }
     
 }
