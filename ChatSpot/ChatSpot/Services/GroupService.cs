@@ -71,9 +71,36 @@ public class GroupService : IGroupService
         return groupToReturn;
     }
 
-    public Task<PagedResult<GroupToReturnDto>> GetMyGroups(BaseResourceParameter baseResourceParameter, string currentUserId)
+    public async Task<PagedResult<GroupToReturnDto>> GetMyGroups(BaseResourceParameter baseResourceParameter, string currentUserId)
     {
-        throw new NotImplementedException();
+        var pagedGroups = await _groupRepository.GetUserGroupsAsync(baseResourceParameter, currentUserId);
+        
+        var groupIds = pagedGroups.Items.Select(g => g.GroupId.ToString()).ToList();
+        
+        var allMeta = await _groupMetaDataRepository.GetByGroupIdsAsync(groupIds);
+        
+        var metaDict = allMeta.ToDictionary(m => m.GroupId);
+        
+        var groupsToReturn = pagedGroups.Items.Select(group =>
+        {
+            var dto = _mapper.Map<GroupToReturnDto>(group);
+            var groupIdStr = group.GroupId.ToString();
+            if (metaDict.TryGetValue(groupIdStr, out var meta))
+            {
+                dto.LastMessage = meta.LastMessage;
+                dto.LastUpdateTime = meta.LastUpdated;
+                dto.UnreadCount = meta.UnreadCount?.GetValueOrDefault(currentUserId) ?? 0;
+            }
+            return dto;
+        }).ToList();
+        return new PagedResult<GroupToReturnDto>
+        {
+            Items = groupsToReturn,
+            TotalCount = pagedGroups.TotalCount,
+            PageNumber = pagedGroups.PageNumber,
+            PageSize = pagedGroups.PageSize
+        };
+        
     }
 
 }
