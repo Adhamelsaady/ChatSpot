@@ -13,8 +13,6 @@ public class MessageToReturnDto : BaseResponse
     public string Content { get; set; } = string.Empty;
 
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-
-    public bool IsRead { get; set; } = false;
     
     public bool IsDeleted { get; set; } = false;
 
