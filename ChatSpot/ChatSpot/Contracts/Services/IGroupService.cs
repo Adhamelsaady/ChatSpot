@@ -12,5 +12,7 @@ public interface IGroupService
     Task<PagedResult<GroupToReturnDto>> GetMyGroups(BaseResourceParameter baseResourceParameter , string currentUserId);
 
     Task<PagedResult<MessageToReturnDto>> GetGroupMessages(BaseResourceParameter baseResourceParameter,
-        string groupId , string currentUserId);
+        string groupId, string currentUserId);
+
+        Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUserId, Guid groupId);
 }

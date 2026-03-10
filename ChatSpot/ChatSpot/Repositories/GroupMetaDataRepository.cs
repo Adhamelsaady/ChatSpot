@@ -7,19 +7,25 @@ namespace ChatSpot.Repositories;
 public class GroupMetaDataRepository : IGroupMetaDataRepository
 {
     private readonly MongoDbContext _db;
+    private IGroupMetaDataRepository _groupMetaDataRepositoryImplementation;
+
     public  GroupMetaDataRepository(MongoDbContext db)
     {
         _db = db;
     }
     public async Task<GroupChatMetaDocument?> GetByGroupIdAsync(string groupId) =>
         await _db.GroupChatMeta.Find(g => g.GroupId == groupId).FirstOrDefaultAsync();
-    
-    public async Task<GroupChatMetaDocument> GetOrCreateAsync(Guid groupId)
+
+    public Task<GroupChatMetaDocument> GetOrCreateAsync(Guid groupId)
     {
-        var id = groupId.ToString();
-        var meta = await GetByGroupIdAsync(id);
+        return _groupMetaDataRepositoryImplementation.GetOrCreateAsync(groupId);
+    }
+
+    public async Task<GroupChatMetaDocument> GetOrCreateAsync(string groupId)
+    {
+        var meta = await GetByGroupIdAsync(groupId);
         if (meta != null) return meta;
-        meta = new GroupChatMetaDocument { GroupId = id };
+        meta = new GroupChatMetaDocument { GroupId = groupId };
         await _db.GroupChatMeta.InsertOneAsync(meta);
         return meta;
     }
@@ -44,24 +50,14 @@ public class GroupMetaDataRepository : IGroupMetaDataRepository
 
     public async Task<GroupChatMetaDocument> UpsertAsync(string groupId , string messageContent , string userId)
     {
-        var meta = await GetByGroupIdAsync(groupId);
-        if (meta != null)
-        {
+        var meta = await GetOrCreateAsync(groupId);
             var update = Builders<GroupChatMetaDocument>.Update
                 .Set(c => c.LastMessage, messageContent)
                 .Set(c => c.LastUpdated, DateTime.UtcNow)
-                .Set(c => c.LastMessage , messageContent);
+                .Set(c => c.LastMessage, messageContent);
             await _db.GroupChatMeta.UpdateOneAsync(c => c.Id == meta.Id, update);
             return meta;
-        }
-
-        var metaToReturn = new GroupChatMetaDocument()
-        {
-            LastMessageId = messageContent,
-            LastUpdated = DateTime.UtcNow,
-            LastMessage = messageContent,
-        };
-        return metaToReturn;
+        return meta;
     }
     
     public async Task IncrementUnreadAsync(string groupId, List<string> exceptUserIds)
@@ -82,7 +78,7 @@ public class GroupMetaDataRepository : IGroupMetaDataRepository
     {
         var meta = await GetByGroupIdAsync (groupId);
         var update = Builders<GroupChatMetaDocument>.Update.Set(c => c.LastMessageId, messageId);
-        await _db.GroupChatMeta.UpdateOneAsync(c => c.Id == groupId, update);
+        await _db.GroupChatMeta.UpdateOneAsync(c => c.GroupId == groupId, update);
         return meta;
     }
 }

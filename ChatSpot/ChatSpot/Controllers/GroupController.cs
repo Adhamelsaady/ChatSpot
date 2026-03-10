@@ -35,6 +35,14 @@ public class GroupController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("{groupId::guid}/send-message")]
+    public async Task<IActionResult> SendMessage([FromBody] MessageForSending messageForSending , [FromRoute] Guid groupId)
+    {
+        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var result = await _groupService.SendMessage(messageForSending, currentUserId , groupId);
+        return Ok(result);
+    }
+    
     [HttpPost("create-group")]
     public async Task<IActionResult> CreateGroup([FromBody] GroupToCreateDto createGroupDt)
     {
@@ -42,7 +50,7 @@ public class GroupController : ControllerBase
         var result = await _groupService.CreateGroup(createGroupDt, currentUserId);
         return Ok(result);
     }
-
+    
 
     [HttpPost("{groupId::guid}/members")]
     public async Task<IActionResult> AddMembersToGroup([FromRoute] Guid groupId, GroupMemberToAddDto membersToAddDto)
