@@ -47,5 +47,18 @@ public class GroupService : IGroupService
             await ChatHub.SendToUserAsync(_hub, uid, "AddedToGroup", groupToReturnDto);
         return groupToReturnDto;
     }
-    
+
+    public async Task<GroupToReturnDto> AddMembersToGroup(Guid groupId, GroupMemberToAddDto groupMemberToAddDto , string currentUserId)
+    {
+        var ok = await _groupRepository.AddMembersAsync(groupId, groupMemberToAddDto.UserIds, currentUserId);
+        if (!ok) return new GroupToReturnDto() { IsSuccess = false, Message = "Something went wrong" };
+
+        var group = await _groupRepository.GetByIdWithMembersAsync(groupId);
+        var meta = await _groupMetaDataRepository.GetByGroupIdAsync(groupId.ToString());
+        var groupToReturn = _mapper.Map<GroupToReturnDto>(group);
+        foreach (var uid in groupMemberToAddDto.UserIds)
+            await ChatHub.SendToUserAsync(_hub, uid, "AddedToGroup", groupToReturn);
+        groupToReturn.IsSuccess = true;
+        return groupToReturn;
+    }
 }

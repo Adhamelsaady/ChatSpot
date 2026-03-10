@@ -25,4 +25,12 @@ public class GroupController : ControllerBase
         var result = await _groupService.CreateGroup(createGroupDt, currentUserId);
         return Ok(result);
     }
+
+
+    [HttpPost("{groupId::guid}/members")]
+    public async Task<IActionResult> AddMembersToGroup([FromRoute] Guid groupId, GroupMemberToAddDto membersToAddDto)
+    {
+        var result = await _groupService.AddMembersToGroup(groupId, membersToAddDto ,  User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+        return result.IsSuccess ? Ok(result) :  BadRequest(result.Message);
+    }
 }

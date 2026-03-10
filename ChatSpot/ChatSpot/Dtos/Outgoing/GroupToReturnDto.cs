@@ -1,6 +1,6 @@
 ﻿namespace ChatSpot.Dtos.Outgoing;
 
-public class GroupToReturnDto
+public class GroupToReturnDto : BaseResponse
 {
     public Guid GroupId { get; set; }
     public string Name { get; set; }

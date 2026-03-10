@@ -2,7 +2,7 @@
 
 namespace ChatSpot.Dtos.Outgoing;
 
-public class GroupMemberDto
+public class GroupMemberDto : BaseResponse
 {
     public GroupRole Role { get; set; }
 
