@@ -27,8 +27,10 @@ public class MessageRepository : IMessageRepository
     
     public async Task<PagedResult<MessageDocument>> GetMessagesOfConversationAsync(BaseResourceParameter resourceParameter , string conversationId)
     {
+        var filter =  Builders<MessageDocument>.Filter.Eq(m => m.ConversationId, conversationId) 
+            & Builders<MessageDocument>.Filter.Eq(m => m.IsDeleted, false);
         var messages =
-            await _db.Messages.Find(Builders<MessageDocument>.Filter.Eq(m => m.ConversationId , conversationId))
+            await _db.Messages.Find(filter)
                 .SortByDescending(m => m.Timestamp)
                 .Skip((resourceParameter.PageNumber - 1) * resourceParameter.PageSize)
                 .Limit(resourceParameter.PageSize)
