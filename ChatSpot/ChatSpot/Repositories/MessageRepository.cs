@@ -63,4 +63,13 @@ public class MessageRepository : IMessageRepository
             PageSize = resourceParameter.PageSize
         };
     }
+
+    public async Task<bool> DeleteMessageAsync(string messageId)
+    {
+        var filter = Builders<MessageDocument>.Filter.Eq(m => m.Id, messageId);
+        var update = Builders<MessageDocument>.Update
+            .Set(m => m.IsDeleted, true);
+        var result = await _db.Messages.UpdateOneAsync(filter, update);
+        return result.ModifiedCount > 0;
+    }
 }

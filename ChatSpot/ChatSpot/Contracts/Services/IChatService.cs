@@ -15,6 +15,7 @@ public interface IChatService
 
     Task<PagedResult<MessageToReturnDto>> GetMessagesOfConversationAsync(BaseResourceParameter resourceParameter,
         string conversationId , string userId);
-    
+
+    Task<BaseResponse> DeleteMessageAsync(string messageId, string userId);
     Task<string> CreateConversationAsync(string user1Id, string user2Id);
 }

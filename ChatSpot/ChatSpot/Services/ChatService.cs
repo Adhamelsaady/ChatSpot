@@ -2,6 +2,7 @@
 using AutoMapper;
 using ChatSpot.Contracts.Persistence;
 using ChatSpot.Contracts.Services;
+using ChatSpot.Dtos;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Dtos.Outgoing;
 using ChatSpot.Dtos.Responses;
@@ -35,7 +36,8 @@ public class ChatService : IChatService
     }
 
 
-    public async Task<PagedResult<ConversationToReturnDto>> GetAllConversationsAsync(BaseResourceParameter resourceParameter,
+    public async Task<PagedResult<ConversationToReturnDto>> GetAllConversationsAsync(
+        BaseResourceParameter resourceParameter,
         string userId)
     {
         var conversations = await _conversationRepository.GetAllConversations(resourceParameter, userId);
@@ -59,7 +61,8 @@ public class ChatService : IChatService
         return result;
     }
 
-    public async Task<MessageToReturnDto> SendMessageAsync(MessageForSending messageForSending, string currentUser ,string conversationId)
+    public async Task<MessageToReturnDto> SendMessageAsync(MessageForSending messageForSending, string currentUser,
+        string conversationId)
     {
         var messageDocument = _mapper.Map<MessageDocument>(messageForSending);
         string? replyPreview = null;
@@ -69,22 +72,25 @@ public class ChatService : IChatService
             if (messageToReply.IsDeleted) replyPreview = "Deleted Message";
             else replyPreview = messageToReply.Content[..Math.Min(60, messageToReply.Content.Length)];
         }
+
         messageDocument.ReceiverId = await GetReceiverIdAsync(conversationId, currentUser);
         messageDocument.ReplyToPreview = replyPreview;
         messageDocument.SenderId = currentUser;
         messageDocument.Timestamp = DateTime.UtcNow;
-        await _conversationRepository.UpsertAsync(conversationId , messageDocument.SenderId, messageDocument.ReceiverId,
+        await _conversationRepository.UpsertAsync(conversationId, messageDocument.SenderId, messageDocument.ReceiverId,
             messageDocument.Content);
-        messageDocument.ConversationId  = conversationId;
+        messageDocument.ConversationId = conversationId;
         var message = await _messageRepository.CreateMessageAsync(messageDocument);
-        await _conversationRepository.UpdateLastMessage(conversationId ,  message.Id);
+        await _conversationRepository.UpdateLastMessage(conversationId, message.Id);
         var result = _mapper.Map<MessageToReturnDto>(message);
         result.IsSuccess = true;
         result.Message = "Message sent";
         return result;
     }
-    public async Task<PagedResult<MessageToReturnDto>> GetMessagesOfConversationAsync(BaseResourceParameter resourceParameter,
-        string conversationId , string userId)
+
+    public async Task<PagedResult<MessageToReturnDto>> GetMessagesOfConversationAsync(
+        BaseResourceParameter resourceParameter,
+        string conversationId, string userId)
     {
         var messages = await _messageRepository.GetMessagesOfConversationAsync(resourceParameter, conversationId);
         await _conversationRepository.MarkConversationAsRead(conversationId, userId);
@@ -93,7 +99,7 @@ public class ChatService : IChatService
             Items = _mapper.Map<List<MessageToReturnDto>>(messages.Items),
             TotalCount = messages.TotalCount,
             PageNumber = messages.PageNumber,
-            PageSize =  messages.PageSize
+            PageSize = messages.PageSize
         };
         return messagesToReturn;
     }
@@ -105,6 +111,7 @@ public class ChatService : IChatService
         {
             return (await _conversationRepository.CreateConversation(user1Id, user2Id)).Id;
         }
+
         return conv.Id;
     }
 
@@ -112,5 +119,28 @@ public class ChatService : IChatService
     {
         var conversation = await _conversationRepository.GetByIdAsync(conversationId);
         return (conversation.Participants[0] == userId ? conversation.Participants[1] : conversation.Participants[0]);
+    }
+
+    public async Task<BaseResponse> DeleteMessageAsync(string messageId, string userId)
+    {
+        var message = await _messageRepository.GetMessageByIdAsync(messageId);
+        if (message.SenderId != userId)
+        {
+            return new BaseResponse()
+            {
+                IsSuccess = false, Message = "UnAuthorized"
+            };
+        }
+
+        if (message.IsDeleted == true)
+        {
+            return new BaseResponse()
+            {
+                IsSuccess = false, Message = "Already deleted"
+            };
+        }
+
+        await _messageRepository.DeleteMessageAsync(messageId);
+        return  new BaseResponse() {IsSuccess = true, Message = "Deleted Successfully"};
     }
 }

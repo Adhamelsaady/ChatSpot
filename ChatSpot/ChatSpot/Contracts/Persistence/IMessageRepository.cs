@@ -12,4 +12,6 @@ public interface IMessageRepository
         string conversationId);
     Task<PagedResult<MessageDocument>> GetMessagesOfGroup(BaseResourceParameter resourceParameter
         , string groupId);
+
+    Task<bool> DeleteMessageAsync(string messageId);
 }
