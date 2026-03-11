@@ -126,4 +126,10 @@ public class GroupRepository : IGroupRepository
         return await _db.GroupMembers
             .FirstOrDefaultAsync(m => m.GroupId == groupId && m.UserId == userId);
     }
+
+    public async Task<bool> IsGroupAdmin(Guid groupId, string userId)
+    {
+        var member = await GetMemberAsync(groupId, userId);
+        return (member != null && (member.Role == GroupRole.admin || member.Role == GroupRole.owner));
+    }
 }

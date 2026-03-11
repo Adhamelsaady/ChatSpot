@@ -58,4 +58,14 @@ public class GroupController : ControllerBase
         var result = await _groupService.AddMembersToGroup(groupId, membersToAddDto ,  User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
         return result.IsSuccess ? Ok(result) :  BadRequest(result.Message);
     }
+    
+    [HttpDelete("{groupId::guid}/delete-message")]
+    public async Task<IActionResult> DeleteMessage([FromRoute] string groupId,
+        [FromBody] DeleteMessageDto deleteMessageDto)
+    {
+        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+        var result = await _groupService.DeleteMessageAsync(deleteMessageDto.MessageId, currentUserId);
+        if(result.IsSuccess) return NoContent();
+        else return BadRequest(result);
+    }
 }

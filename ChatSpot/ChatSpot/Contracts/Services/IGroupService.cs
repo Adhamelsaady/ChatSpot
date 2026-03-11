@@ -1,4 +1,5 @@
-﻿using ChatSpot.Dtos.Ingoing;
+﻿using ChatSpot.Dtos;
+using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Dtos.Outgoing;
 using ChatSpot.Dtos.Responses;
 using ChatSpot.ResourceParameters;
@@ -14,5 +15,6 @@ public interface IGroupService
     Task<PagedResult<MessageToReturnDto>> GetGroupMessages(BaseResourceParameter baseResourceParameter,
         string groupId, string currentUserId);
 
+    Task<BaseResponse> DeleteMessageAsync(string messageId, string userId);
         Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUserId, Guid groupId);
 }

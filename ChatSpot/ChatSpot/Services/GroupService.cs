@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ChatSpot.Contracts.Persistence;
 using ChatSpot.Contracts.Services;
+using ChatSpot.Dtos;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Dtos.Outgoing;
 using ChatSpot.Dtos.Responses;
@@ -103,7 +104,7 @@ public class GroupService : IGroupService
         };
         
     }
-
+    
     public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending , string currentUserId , Guid groupId)
     {
         var messageDocument = _mapper.Map<MessageDocument>(messageForSending);
@@ -147,5 +148,28 @@ public class GroupService : IGroupService
         };
         return messagesToReturn;
     }
+    
+    public async Task<BaseResponse> DeleteMessageAsync(string messageId, string userId)
+    {
+        var message = await _messageRepository.GetMessageByIdAsync(messageId);
+        var groupId = Guid.Parse(message.GroupId);
+        if (message.SenderId != userId || !await _groupRepository.IsGroupAdmin(groupId, userId))
+        {
+            return new BaseResponse()
+            {
+                IsSuccess = false, Message = "UnAuthorized"
+            };
+        }
 
+        if (message.IsDeleted == true)
+        {
+            return new BaseResponse()
+            {
+                IsSuccess = false, Message = "Already deleted"
+            };
+        }
+
+        await _messageRepository.DeleteMessageAsync(messageId);
+        return  new BaseResponse() {IsSuccess = true, Message = "Deleted Successfully"};
+    }
 }
