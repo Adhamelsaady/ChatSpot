@@ -51,7 +51,15 @@ public class ChatController : ControllerBase
         if(result.IsSuccess) return Ok(result);
         else return  BadRequest(result);
     }
-    
-    
+
+    [HttpDelete("{conversationId}/delete-message")]
+    public async Task<IActionResult> DeleteMessage([FromRoute] string conversationId,
+        [FromBody] DeleteMessageDto deleteMessageDto)
+    {
+        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+        var result = await _chatService.DeleteMessageAsync(deleteMessageDto.MessageId, currentUserId);
+        if(result.IsSuccess) return NoContent();
+        else return BadRequest(result);
+    }
     
 }
