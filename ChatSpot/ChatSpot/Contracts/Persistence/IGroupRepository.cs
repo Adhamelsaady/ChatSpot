@@ -18,4 +18,6 @@ public interface IGroupRepository
     Task<GroupMember?> GetMemberAsync(Guid groupId, string userId);
     
     Task<bool> IsGroupAdmin(Guid groupId, string userId);
+
+    Task<bool> RemoveMemberAsync(Guid groupId, string userId);
 }

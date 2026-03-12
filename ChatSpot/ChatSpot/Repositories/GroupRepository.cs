@@ -132,4 +132,13 @@ public class GroupRepository : IGroupRepository
         var member = await GetMemberAsync(groupId, userId);
         return (member != null && (member.Role == GroupRole.admin || member.Role == GroupRole.owner));
     }
+
+    public async Task<bool> RemoveMemberAsync(Guid groupId, string userId)
+    {
+        var member = await _db.GroupMembers
+            .FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == userId);
+        if (member == null) return false;
+        _db.GroupMembers.Remove(member);
+        return true;
+    }
 }
