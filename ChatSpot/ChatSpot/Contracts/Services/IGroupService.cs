@@ -15,6 +15,7 @@ public interface IGroupService
     Task<PagedResult<MessageToReturnDto>> GetGroupMessages(BaseResourceParameter baseResourceParameter,
         string groupId, string currentUserId);
 
+    Task<BaseResponse> RemoveMemberAsync(Guid groupId, string removerId, string targetUserId);
     Task<BaseResponse> DeleteMessageAsync(string messageId, string userId);
         Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUserId, Guid groupId);
 }

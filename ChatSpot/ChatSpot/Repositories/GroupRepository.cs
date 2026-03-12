@@ -139,6 +139,7 @@ public class GroupRepository : IGroupRepository
             .FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == userId);
         if (member == null) return false;
         _db.GroupMembers.Remove(member);
+        await _db.SaveChangesAsync();
         return true;
     }
 }

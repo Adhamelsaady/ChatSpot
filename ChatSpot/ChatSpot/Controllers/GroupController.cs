@@ -68,4 +68,18 @@ public class GroupController : ControllerBase
         if(result.IsSuccess) return NoContent();
         else return BadRequest(result);
     }
+
+    [HttpDelete("{groupId}/remove/{targetUserId}")]
+    public async Task<IActionResult> RemoveMember(Guid groupId, string targetUserId)
+    { 
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(currentUserId)) return Unauthorized();
+        if (currentUserId == targetUserId) return BadRequest();
+        var result = await _groupService.RemoveMemberAsync(groupId, currentUserId, targetUserId);
+        if (!result.IsSuccess)
+        {
+            return Forbid(result.Message);
+        }
+        return Ok(result.Message);
+    }
 }

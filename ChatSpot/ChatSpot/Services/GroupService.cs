@@ -172,4 +172,20 @@ public class GroupService : IGroupService
         await _messageRepository.DeleteMessageAsync(messageId);
         return  new BaseResponse() {IsSuccess = true, Message = "Deleted Successfully"};
     }
+
+    public async Task<BaseResponse> RemoveMemberAsync(Guid groupId, string removerId, string targetUserId)
+    {
+        var admin = await _groupRepository.GetMemberAsync(groupId, removerId);
+        var target = await _groupRepository.GetMemberAsync(groupId, targetUserId);
+        if (admin == null || target == null)
+        {
+            return new BaseResponse() {IsSuccess = false, Message = "UnAuthorized"};
+        }
+        if (admin.Role >= target.Role && admin.Role != GroupRole.owner)
+        {
+            return new BaseResponse() {IsSuccess = false, Message = "UnAuthorized"};
+        }
+        await _groupRepository.RemoveMemberAsync(groupId, targetUserId);
+        return new BaseResponse() {IsSuccess = true, Message = "Removed Successfully"};
+    }
 }
