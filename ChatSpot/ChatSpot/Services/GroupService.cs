@@ -188,4 +188,21 @@ public class GroupService : IGroupService
         await _groupRepository.RemoveMemberAsync(groupId, targetUserId);
         return new BaseResponse() {IsSuccess = true, Message = "Removed Successfully"};
     }
+
+
+    public async Task<BaseResponse> LeaveGroupAsync(Guid groupId, string userId)
+    {
+        var member = await _groupRepository.GetMemberAsync(groupId, userId);
+        if(member.Role == GroupRole.owner) 
+            return  new BaseResponse(){IsSuccess = false, Message = "Owner can't leave the group"};
+        var removed = await _groupRepository.RemoveMemberAsync(groupId, userId);
+        if (removed)
+        {
+            return new BaseResponse(){IsSuccess = true, Message = "Removed Successfully"};
+        }
+        else
+        {
+            return new BaseResponse() {IsSuccess = false, Message = "Member can't be removed"};
+        }
+    }
 }

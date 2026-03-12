@@ -69,11 +69,10 @@ public class GroupController : ControllerBase
         else return BadRequest(result);
     }
 
-    [HttpDelete("{groupId}/remove/{targetUserId}")]
-    public async Task<IActionResult> RemoveMember(Guid groupId, string targetUserId)
+    [HttpDelete("{groupId::guid}/remove/{targetUserId}")]
+    public async Task<IActionResult> RemoveMember([FromRoute] Guid groupId, [FromRoute] string targetUserId)
     { 
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(currentUserId)) return Unauthorized();
         if (currentUserId == targetUserId) return BadRequest();
         var result = await _groupService.RemoveMemberAsync(groupId, currentUserId, targetUserId);
         if (!result.IsSuccess)
@@ -81,5 +80,17 @@ public class GroupController : ControllerBase
             return Forbid(result.Message);
         }
         return Ok(result.Message);
+    }
+
+    [HttpDelete("{groupId::guid}/members/leave")]
+    public async Task<IActionResult> LeaveGroup([FromRoute] Guid groupId)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var result = await _groupService.LeaveGroupAsync(groupId, userId);
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.Message);
+        }
+        return NoContent(); 
     }
 }
