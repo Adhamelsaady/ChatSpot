@@ -24,4 +24,7 @@ public interface IGroupService
 
     Task<BaseResponse> LeaveGroupAsync(Guid groupId, string userId);
     Task<BaseResponse> ToggleMemberAdminRoleAsync(Guid groupId, string targetUserId, string requesterId);
+
+    Task<PagedResult<GroupMemberToReturnDto>> GetGroupMembers(
+        BaseResourceParameter baseResourceParameter, Guid groupId, string currentUserId);
 }

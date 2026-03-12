@@ -227,4 +227,25 @@ public class GroupService : IGroupService
             Message = $"User successfully changed to {newRole}." 
         };
     }
+    
+    public async Task<PagedResult<GroupMemberToReturnDto>> GetGroupMembers(
+        BaseResourceParameter baseResourceParameter, Guid groupId, string currentUserId)
+    {
+        var group = await _groupRepository.GetByIdWithMembersAsync(groupId);
+        if (group == null || !group.Members.Any(m => m.UserId == currentUserId))
+            return null;
+        var query = group.Members.AsQueryable();
+        var totalCount = query.Count();
+        var items = query
+            .Skip((baseResourceParameter.PageNumber - 1) * baseResourceParameter.PageSize)
+            .Take(baseResourceParameter.PageSize)
+            .ToList();
+        return new PagedResult<GroupMemberToReturnDto>
+        {
+            Items = _mapper.Map<List<GroupMemberToReturnDto>>(items),
+            TotalCount = totalCount,
+            PageNumber = baseResourceParameter.PageNumber,
+            PageSize = baseResourceParameter.PageSize
+        };
+    }
 }

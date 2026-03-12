@@ -2,6 +2,8 @@
 using ChatSpot.Contracts.Persistence;
 using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos.Ingoing;
+using ChatSpot.Dtos.Outgoing;
+using ChatSpot.Dtos.Responses;
 using ChatSpot.ResourceParameters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -97,6 +99,16 @@ public class GroupController : ControllerBase
         var result = await _groupService.ToggleMemberAdminRoleAsync(groupId, userId, requesterId);
         Console.WriteLine(result.Message);
         if (!result.IsSuccess) return Forbid();
+        return Ok(result);
+    }
+    [HttpGet("{groupId:guid}/members")]
+    public async Task<IActionResult> GetMembers(
+        [FromQuery] BaseResourceParameter resourceParameter, 
+        Guid groupId)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var result = await _groupService.GetGroupMembers(resourceParameter, groupId, currentUserId);
+        if (result == null) return Forbid();
         return Ok(result);
     }
 }
