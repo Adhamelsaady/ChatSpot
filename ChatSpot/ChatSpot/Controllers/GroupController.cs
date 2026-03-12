@@ -56,7 +56,7 @@ public class GroupController : ControllerBase
     public async Task<IActionResult> AddMembersToGroup([FromRoute] Guid groupId, GroupMemberToAddDto membersToAddDto)
     {
         var result = await _groupService.AddMembersToGroup(groupId, membersToAddDto ,  User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
-        return result.IsSuccess ? Ok(result) :  BadRequest(result.Message);
+        return result.IsSuccess ? Ok(result) :  Forbid(result.Message);
     }
     
     [HttpDelete("{groupId::guid}/delete-message")]
@@ -66,7 +66,7 @@ public class GroupController : ControllerBase
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
         var result = await _groupService.DeleteMessageAsync(deleteMessageDto.MessageId, currentUserId);
         if(result.IsSuccess) return NoContent();
-        else return BadRequest(result);
+        else return Forbid(result.Message);
     }
 
     [HttpDelete("{groupId::guid}/remove/{targetUserId}")]
@@ -79,7 +79,7 @@ public class GroupController : ControllerBase
         {
             return Forbid(result.Message);
         }
-        return Ok(result.Message);
+        return NoContent();
     }
 
     [HttpDelete("{groupId::guid}/members/leave")]
@@ -89,7 +89,7 @@ public class GroupController : ControllerBase
         var result = await _groupService.LeaveGroupAsync(groupId, userId);
         if (!result.IsSuccess)
         {
-            return BadRequest(result.Message);
+            return Forbid(result.Message);
         }
         return NoContent(); 
     }
