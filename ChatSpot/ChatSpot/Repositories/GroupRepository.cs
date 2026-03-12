@@ -113,7 +113,8 @@ public class GroupRepository : IGroupRepository
     {
         var requester = await GetMemberAsync(groupId, requesterId);
         var applyOn = await GetMemberAsync(groupId, userId);
-        if (requester?.Role != GroupRole.admin || applyOn?.Role == GroupRole.owner) return false;
+        if (requester?.Role == GroupRole.member || applyOn?.Role == GroupRole.owner) 
+            return false;
         await _db.GroupMembers
             .Where(m => m.GroupId == groupId && m.UserId == userId)
             .ExecuteUpdateAsync(s => s.SetProperty(m => m.Role, role));

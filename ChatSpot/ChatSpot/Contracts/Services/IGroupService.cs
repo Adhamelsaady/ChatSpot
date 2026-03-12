@@ -23,4 +23,5 @@ public interface IGroupService
     Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUserId, Guid groupId);
 
     Task<BaseResponse> LeaveGroupAsync(Guid groupId, string userId);
+    Task<BaseResponse> ToggleMemberAdminRoleAsync(Guid groupId, string targetUserId, string requesterId);
 }

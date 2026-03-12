@@ -82,15 +82,21 @@ public class GroupController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{groupId::guid}/members/leave")]
+    [HttpDelete("{groupId::guid}/leave")]
     public async Task<IActionResult> LeaveGroup([FromRoute] Guid groupId)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var result = await _groupService.LeaveGroupAsync(groupId, userId);
-        if (!result.IsSuccess)
-        {
-            return Forbid();
-        }
+        if (!result.IsSuccess) return Forbid();
         return NoContent(); 
+    }
+    [HttpPost("{groupId:guid}/members/{userId}/change-role")]
+    public async Task<IActionResult> ChangeRole(Guid groupId, string userId)
+    {
+        var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var result = await _groupService.ToggleMemberAdminRoleAsync(groupId, userId, requesterId);
+        Console.WriteLine(result.Message);
+        if (!result.IsSuccess) return Forbid();
+        return Ok(result);
     }
 }

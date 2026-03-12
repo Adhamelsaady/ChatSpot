@@ -205,4 +205,26 @@ public class GroupService : IGroupService
             return new BaseResponse() {IsSuccess = false, Message = "Member can't be removed"};
         }
     }
+    
+    public async Task<BaseResponse> ToggleMemberAdminRoleAsync(Guid groupId, string targetUserId, string requesterId)
+    {
+        var targetMember = await _groupRepository.GetMemberAsync(groupId, targetUserId);
+        if (targetMember == null)
+            return new BaseResponse { IsSuccess = false, Message = "User is not in this group." };
+        if (targetMember.Role == GroupRole.owner)
+            return new BaseResponse { IsSuccess = false, Message = "Cannot change the role of the group owner." };
+        var newRole = targetMember.Role == GroupRole.admin ? GroupRole.member : GroupRole.admin;
+        var success = await _groupRepository.UpdateMemberRoleAsync(groupId, targetUserId, newRole, requesterId);
+        if (!success)
+        {
+            return new BaseResponse { 
+                IsSuccess = false, 
+                Message = "Action failed. Ensure you have the required permissions (Admin/Owner)." 
+            };
+        }
+        return new BaseResponse { 
+            IsSuccess = true, 
+            Message = $"User successfully changed to {newRole}." 
+        };
+    }
 }
