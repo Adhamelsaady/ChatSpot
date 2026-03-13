@@ -1,11 +1,12 @@
-﻿using ChatSpot.Models.SQL;
+﻿using ChatSpot.Contracts.Services;
+using ChatSpot.Models.SQL;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatSpot.Services;
 
-public class ConnectionService
+public class ConnectionService : IConnectionService
 {
-    private readonly ChatSpotDbContext _db; // replace with your actual DbContext name
+    private readonly ChatSpotDbContext _db; 
     
     public ConnectionService(ChatSpotDbContext db)
     {
@@ -50,12 +51,12 @@ public class ConnectionService
         }
     }
 
-    public async Task<List<UserConnection>> GetOnlineUsers()
+    public async Task<List<UserConnection>> GetOnlineUsersAsync()
     {
         return await _db.UserConnections.Where(c => c.IsConnected).ToListAsync();
     }
 
-    public async Task<List<UserConnection>> GetUserConnections(string userId)
+    public async Task<List<UserConnection>> GetUserConnectionsAsync(string userId)
     {
         return await _db.UserConnections.Where(c => c.UserId == userId && c.IsConnected).ToListAsync();
     }

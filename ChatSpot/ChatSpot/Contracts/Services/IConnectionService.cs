@@ -6,6 +6,6 @@ public interface IConnectionService
 {
     Task ConnectAsync(string userId, string connectionId);
     Task DisconnectAsync(string connectionId);
-    List<UserConnection> GetOnlineUsers();
-    List<UserConnection> GetUserConnections(string userId);
+    Task<List<UserConnection>> GetOnlineUsersAsync();
+    Task<List<UserConnection>> GetUserConnectionsAsync(string userId);
 }

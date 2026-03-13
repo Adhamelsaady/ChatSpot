@@ -19,5 +19,6 @@ public static class ServicesConfigurations
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IGroupService, GroupService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IConnectionService, ConnectionService>();
     }
 }
