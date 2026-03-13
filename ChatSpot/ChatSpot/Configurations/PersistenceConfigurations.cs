@@ -32,5 +32,6 @@ public static class PersistenceConfigurations
         services.AddScoped<IGroupRepository, GroupRepository>();
         services.AddScoped<IConversationRepository, ConversationRepository>();
         services.AddScoped<IGroupMetaDataRepository , GroupMetaDataRepository>();
+        services.AddScoped<IUserRepository , UserRepository>();
     }
 }
