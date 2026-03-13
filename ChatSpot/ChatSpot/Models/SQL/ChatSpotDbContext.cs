@@ -11,6 +11,8 @@ public class ChatSpotDbContext : DbContext
     public DbSet<Group> Groups {get; set;}
     public DbSet<GroupMember> GroupMembers {get; set;}
     public DbSet<RefreshToken>  RefreshTokens {get; set;}
+    
+    public DbSet<UserConnection>  UserConnections {get; set;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
