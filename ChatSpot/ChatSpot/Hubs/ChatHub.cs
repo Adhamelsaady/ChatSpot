@@ -10,16 +10,12 @@ namespace ChatSpot.Hubs;
 [Authorize]
 public class ChatHub : Hub
 {
-    private readonly IChatService _chatService;
-    private readonly IGroupService _groupService;
     private readonly IConnectionService _connectionService;
 
     public ChatHub(IChatService chatService,
         IGroupService groupService, 
         IConnectionService connectionService)
     {
-        _chatService = chatService;
-        _groupService = groupService;
         _connectionService = connectionService;
     }
     
@@ -65,14 +61,10 @@ public class ChatHub : Hub
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"group : {groupId}");
     }
     
-    
     public async Task SendGroupMessage(string groupId, MessageForSending messageForSending , MessageToReturnDto messageToReturnDto)
     {
-        var senderId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(groupId, out var groupGuid)) return;
-
         if (!messageToReturnDto.IsSuccess) return;
-
         await Clients.Group($"group : {groupId}")
             .SendAsync("ReceiveGroupMessage", groupId, messageToReturnDto);
     }
@@ -92,22 +84,18 @@ public class ChatHub : Hub
         => await Clients.OthersInGroup($"group : {groupId}").SendAsync("UserTypingInGroup", groupId, Context.User?.FindFirstValue(ClaimTypes.NameIdentifier));
 
     public async Task StoppedTypingInGroup(string groupId)
-        => await Clients.OthersInGroup($"group : {groupId}").SendAsync("UserStoppedTypingInGroup", groupId, Context.User?.FindFirstValue(ClaimTypes.NameIdentifier)
+        => await Clients.OthersInGroup($"group : {groupId}").SendAsync("UserStoppedTypingInGroup", groupId,
+            Context.User?.FindFirstValue(ClaimTypes.NameIdentifier));
     
     public async Task DeleteDirectMessage(string conversationId, string messageId, string otherUserId)
     {
         var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-        var result = await _chatService.DeleteMessageAsync(messageId, userId);
-        if (!result.IsSuccess) return;
         await Clients.User(otherUserId).SendAsync("DirectMessageDeleted", conversationId, messageId);
         await Clients.User(userId).SendAsync("DirectMessageDeleted", conversationId, messageId);
     }
     public async Task DeleteGroupMessage(string groupId, string messageId)
     {
         var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-        var result = await _groupService.DeleteMessageAsync(messageId, userId);
-        if (!result.IsSuccess) return;
-
         await Clients.Group($"group : {groupId}")
             .SendAsync("GroupMessageDeleted", groupId, messageId);
     }
