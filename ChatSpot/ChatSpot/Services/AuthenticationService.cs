@@ -23,10 +23,8 @@ public class AuthenticationService : IAuthenticationService
     private readonly IJwtTokenGeneration _jwtTokenGeneration;
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
-    private readonly MongoDbContext _mongoDbContext;
 
     public AuthenticationService(
-        MongoDbContext mongoDbContext,
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IOtpService otpService,
@@ -44,7 +42,6 @@ public class AuthenticationService : IAuthenticationService
         _jwtTokenGeneration = jwtTokenGeneration;
         _tokenValidationParameters = tokenValidationParameters;
         _refreshTokenRepository = refreshTokenRepository;
-        _mongoDbContext = mongoDbContext;
     }
 
     public async Task<BaseResponse> Register(RegisterDto registerDto)
@@ -213,6 +210,12 @@ public class AuthenticationService : IAuthenticationService
             RefreshToken = tokenResult.RefreshToken,
             Token = tokenResult.Token,
         };
+    }
+
+    public async Task<bool> Logout(LogoutDto logoutDto)
+    {
+        var result = await _refreshTokenRepository.MarkRefreshTokenAsRevokedAsync(logoutDto.RefreshToken);
+        return result;
     }
 
     private DateTime UnixTimeToDateTime(long unixTime)

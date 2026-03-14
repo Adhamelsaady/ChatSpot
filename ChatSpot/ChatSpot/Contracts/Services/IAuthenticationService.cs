@@ -12,4 +12,5 @@ public interface IAuthenticationService
     Task<AuthResult> Login(LoginDto loginDto);
     
     Task <AuthResult> RefreshToken(RefreshTokenDto refreshTokenDto);
+    Task<bool> Logout(LogoutDto logoutDto);
 }

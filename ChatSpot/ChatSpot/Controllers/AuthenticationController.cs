@@ -71,5 +71,11 @@ public class AuthenticationController : ControllerBase
         return result.IsSuccess ? Ok(result) : BadRequest(result.Message);
     }
 
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(LogoutDto logoutDto)
+    {
+        await _authenticationService.Logout(logoutDto);
+        return Ok();
+    }
     
 }

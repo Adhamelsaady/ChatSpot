@@ -6,4 +6,5 @@ public interface IRefreshTokenRepository
 {
     Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken);
     Task<bool> MarkRefreshTokenAsUsedAsync(RefreshToken refreshToken);
+    Task<bool> MarkRefreshTokenAsRevokedAsync(string refreshToken);
 }
