@@ -32,7 +32,8 @@ public class GroupService : IGroupService
     }
 
     public async Task<GroupToReturnDto> CreateGroup(GroupToCreateDto createGroupDto, string currentUserId)
-    {
+    { 
+        var allMemberIds = createGroupDto.Members.Distinct().Where(id => id != currentUserId).ToList();
         var group = _mapper.Map<Group>(createGroupDto);
         group.CreatorId = currentUserId;
         group.CreatedAt = DateTime.UtcNow;
@@ -51,7 +52,8 @@ public class GroupService : IGroupService
         await _groupMetaDataRepository.GetOrCreateAsync(group.GroupId);
         var fullGroup = await _groupRepository.GetByIdWithMembersAsync(group.GroupId);
         var groupToReturnDto = _mapper.Map<GroupToReturnDto>(fullGroup);
-       
+        foreach (var memberId in allMemberIds)
+            await _hub.Clients.User(memberId).SendAsync("AddedToGroup", groupToReturnDto);
         return groupToReturnDto;
     }
 
@@ -63,6 +65,9 @@ public class GroupService : IGroupService
         var group = await _groupRepository.GetByIdWithMembersAsync(groupId);
         var groupToReturn = _mapper.Map<GroupToReturnDto>(group);
         groupToReturn.IsSuccess = true;
+        foreach (var memberId in groupMemberToAddDto.UserIds)
+            await _hub.Clients.User(memberId).SendAsync("AddedToGroup", groupToReturn);
+        await _hub.Clients.Group($"group:{groupId}").SendAsync("MembersAdded", groupId, groupMemberToAddDto.UserIds);
         return groupToReturn;
     }
 
@@ -125,6 +130,7 @@ public class GroupService : IGroupService
         var result = _mapper.Map<MessageToReturnDto>(message);
         result.IsSuccess = true;
         result.Message = "Message sent";
+        await _hub.Clients.Group($"group:{groupId}").SendAsync("ReceiveGroupMessage", groupId.ToString(), result);
         return result;
     }
     public async Task<PagedResult<MessageToReturnDto>> GetGroupMessages(BaseResourceParameter baseResourceParameter,
@@ -163,6 +169,7 @@ public class GroupService : IGroupService
         }
 
         await _messageRepository.DeleteMessageAsync(messageId);
+        await _hub.Clients.Group($"group:{groupId}").SendAsync("GroupMessageDeleted", message.GroupId, messageId);
         return  new BaseResponse() {IsSuccess = true, Message = "Deleted Successfully"};
     }
 
@@ -179,6 +186,8 @@ public class GroupService : IGroupService
             return new BaseResponse() {IsSuccess = false, Message = "UnAuthorized"};
         }
         await _groupRepository.RemoveMemberAsync(groupId, targetUserId);
+        await _hub.Clients.User(targetUserId).SendAsync("RemovedFromGroup", groupId);
+        await _hub.Clients.Group($"group:{groupId}").SendAsync("MemberRemoved", groupId, targetUserId);
         return new BaseResponse() {IsSuccess = true, Message = "Removed Successfully"};
     }
 
@@ -191,6 +200,7 @@ public class GroupService : IGroupService
         var removed = await _groupRepository.RemoveMemberAsync(groupId, userId);
         if (removed)
         {
+            await _hub.Clients.Group($"group:{groupId}").SendAsync("MemberLeft", groupId, userId);
             return new BaseResponse(){IsSuccess = true, Message = "Removed Successfully"};
         }
         else
@@ -215,6 +225,8 @@ public class GroupService : IGroupService
                 Message = "Action failed. Ensure you have the required permissions (Admin/Owner)." 
             };
         }
+        await _hub.Clients.User(targetUserId).SendAsync("RoleChanged", groupId, newRole.ToString());
+        await _hub.Clients.Group($"group:{groupId}").SendAsync("MemberRoleChanged", groupId, targetUserId, newRole.ToString());
         return new BaseResponse { 
             IsSuccess = true, 
             Message = $"User successfully changed to {newRole}." 

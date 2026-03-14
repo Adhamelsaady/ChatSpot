@@ -85,6 +85,8 @@ public class ChatService : IChatService
         var result = _mapper.Map<MessageToReturnDto>(message);
         result.IsSuccess = true;
         result.Message = "Message sent";
+        await _chatHub.Clients.User(currentUser).SendAsync("ReceiveDirectMessage", conversationId, result);
+        await _chatHub.Clients.User(messageDocument.ReceiverId).SendAsync("ReceiveDirectMessage", conversationId, result);
         return result;
     }
 
@@ -115,12 +117,6 @@ public class ChatService : IChatService
         return conv.Id;
     }
 
-    private async Task<string> GetReceiverIdAsync(string conversationId, string userId)
-    {
-        var conversation = await _conversationRepository.GetByIdAsync(conversationId);
-        return (conversation.Participants[0] == userId ? conversation.Participants[1] : conversation.Participants[0]);
-    }
-
     public async Task<BaseResponse> DeleteMessageAsync(string messageId, string userId)
     {
         var message = await _messageRepository.GetMessageByIdAsync(messageId);
@@ -141,6 +137,15 @@ public class ChatService : IChatService
         }
 
         await _messageRepository.DeleteMessageAsync(messageId);
+        var receiverId = await GetReceiverIdAsync(message.ConversationId, userId);
+        await _chatHub.Clients.User(userId).SendAsync("DirectMessageDeleted", message.ConversationId, messageId);
+        await _chatHub.Clients.User(receiverId).SendAsync("DirectMessageDeleted", message.ConversationId, messageId);
+
         return  new BaseResponse() {IsSuccess = true, Message = "Deleted Successfully"};
+    }
+    private async Task<string> GetReceiverIdAsync(string conversationId, string userId)
+    {
+        var conversation = await _conversationRepository.GetByIdAsync(conversationId);
+        return (conversation.Participants[0] == userId ? conversation.Participants[1] : conversation.Participants[0]);
     }
 }
