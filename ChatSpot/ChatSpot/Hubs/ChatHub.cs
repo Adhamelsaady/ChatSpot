@@ -31,7 +31,7 @@ public class ChatHub : Hub
     {
         var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
         await _connectionService.DisconnectAsync(Context.ConnectionId);
-        var remaining = _connectionService.GetUserConnectionsAsync(userId);
+        var remaining = await _connectionService.GetUserConnectionsAsync(userId);
         if (!remaining.Any())
             await Clients.Others.SendAsync("UserOffline", userId);
         await base.OnDisconnectedAsync(exception);

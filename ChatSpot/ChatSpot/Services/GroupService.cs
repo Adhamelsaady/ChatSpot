@@ -33,8 +33,6 @@ public class GroupService : IGroupService
 
     public async Task<GroupToReturnDto> CreateGroup(GroupToCreateDto createGroupDto, string currentUserId)
     {
-        var allMemberIds = createGroupDto.Members.Distinct().Where(id => id != currentUserId).ToList();
-        Console.WriteLine("1");
         var group = _mapper.Map<Group>(createGroupDto);
         group.CreatorId = currentUserId;
         group.CreatedAt = DateTime.UtcNow;
@@ -49,12 +47,10 @@ public class GroupService : IGroupService
             members.Add(new GroupMember()
                 { GroupId = group.GroupId, UserId = uid, Role = GroupRole.member, JoinedAt = DateTime.UtcNow });
 
-        Console.WriteLine("2");
         await _groupRepository.CreateAsync(group, members);
         await _groupMetaDataRepository.GetOrCreateAsync(group.GroupId);
         var fullGroup = await _groupRepository.GetByIdWithMembersAsync(group.GroupId);
         var groupToReturnDto = _mapper.Map<GroupToReturnDto>(fullGroup);
-        Console.WriteLine("3");
        
         return groupToReturnDto;
     }
@@ -64,11 +60,8 @@ public class GroupService : IGroupService
     {
         var ok = await _groupRepository.AddMembersAsync(groupId, groupMemberToAddDto.UserIds, currentUserId);
         if (!ok) return new GroupToReturnDto() { IsSuccess = false, Message = "Something went wrong" };
-
         var group = await _groupRepository.GetByIdWithMembersAsync(groupId);
-        var meta = await _groupMetaDataRepository.GetByGroupIdAsync(groupId.ToString());
         var groupToReturn = _mapper.Map<GroupToReturnDto>(group);
-        
         groupToReturn.IsSuccess = true;
         return groupToReturn;
     }
