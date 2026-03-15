@@ -12,9 +12,10 @@ public class UserRepository : IUserRepository
     private readonly ChatSpotDbContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public UserRepository(ChatSpotDbContext db)
+    public UserRepository(ChatSpotDbContext db , UserManager<ApplicationUser> userManager)
     {
         _db = db;
+        _userManager = userManager;
     }
 
     public async Task<PagedResult<ApplicationUser>> SearchUsers(BaseResourceParameter resourceParameter,

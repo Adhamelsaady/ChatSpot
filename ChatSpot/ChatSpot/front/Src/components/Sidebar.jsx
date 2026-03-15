@@ -1,0 +1,170 @@
+import React, { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useChat } from '../context/ChatContext';
+import { formatDistanceToNow } from 'date-fns';
+import styles from './Sidebar.module.css';
+
+const Avatar = ({ name, src, size = 38, online }) => {
+  const initials = name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '?';
+  const colors = ['#7c6af0', '#6a8af0', '#f06a8a', '#f0a06a', '#6af0a8'];
+  const color = colors[(name?.charCodeAt(0) || 0) % colors.length];
+  return (
+      <div className={styles.avatar} style={{ width: size, height: size, background: src ? 'transparent' : color }}>
+        {src ? <img src={src} alt={name} /> : <span>{initials}</span>}
+        {online !== undefined && (
+            <span className={`${styles.dot} ${online ? styles.online : styles.offline}`} />
+        )}
+      </div>
+  );
+};
+
+export default function Sidebar({ onNewChat, onNewGroup }) {
+  const { user, logout } = useAuth();
+  const { conversations, groups, activeChat, openChat } = useChat();
+  const [tab, setTab] = useState('dms');
+  const [search, setSearch] = useState('');
+
+  const filtered = tab === 'dms'
+      ? conversations.filter(c => {
+        const name = c.user?.userName || c.user?.email || '';
+        return name.toLowerCase().includes(search.toLowerCase()) ||
+            c.lastMessage?.toLowerCase().includes(search.toLowerCase());
+      })
+      : groups.filter(g => g.name?.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+      <aside className={styles.sidebar}>
+        <div className={styles.header}>
+          <div className={styles.logo}>
+            <span className={styles.logoIcon}>◈</span>
+            <span className={styles.logoText}>ChatSpot</span>
+          </div>
+          <div className={styles.headerActions}>
+            <button className={styles.iconBtn} onClick={onNewChat} title="New message">
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+            </button>
+            <button className={styles.iconBtn} onClick={onNewGroup} title="New group">
+              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div className={styles.searchWrap}>
+          <svg className={styles.searchIcon} width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input
+              className={styles.search}
+              placeholder="Search conversations…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className={styles.tabs}>
+          <button
+              className={`${styles.tab} ${tab === 'dms' ? styles.activeTab : ''}`}
+              onClick={() => setTab('dms')}
+          >
+            Messages
+            {conversations.length > 0 && <span className={styles.count}>{conversations.length}</span>}
+          </button>
+          <button
+              className={`${styles.tab} ${tab === 'groups' ? styles.activeTab : ''}`}
+              onClick={() => setTab('groups')}
+          >
+            Groups
+            {groups.length > 0 && <span className={styles.count}>{groups.length}</span>}
+          </button>
+        </div>
+
+        <div className={styles.list}>
+          {filtered.length === 0 && (
+              <div className={styles.empty}>
+                {search ? 'No results found' : tab === 'dms' ? 'No conversations yet' : 'No groups yet'}
+              </div>
+          )}
+
+          {tab === 'dms' && filtered.map((conv) => {
+            const otherName = conv.user?.userName || conv.user?.email || 'Unknown';
+            const isOnline = conv.user?.status === 'Online';
+            const isActive = activeChat?.id === conv.id;
+            const unread = conv.unreadMessagesCount || 0;
+            return (
+                <button
+                    key={conv.id}
+                    className={`${styles.item} ${isActive ? styles.activeItem : ''}`}
+                    onClick={() => openChat({ type: 'dm', id: conv.id, data: conv })}
+                >
+                  <Avatar name={otherName} online={isOnline} />
+                  <div className={styles.itemContent}>
+                    <div className={styles.itemTop}>
+                      <span className={styles.itemName}>{otherName}</span>
+                      {conv.lastMessageDate && (
+                          <span className={styles.itemTime}>
+                      {formatDistanceToNow(new Date(conv.lastMessageDate), { addSuffix: false })}
+                    </span>
+                      )}
+                    </div>
+                    <div className={styles.itemBottom}>
+                      <span className={styles.itemPreview}>{conv.lastMessage || 'No messages yet'}</span>
+                      {unread > 0 && <span className={styles.badge}>{unread}</span>}
+                    </div>
+                  </div>
+                </button>
+            );
+          })}
+
+          {tab === 'groups' && filtered.map((group) => {
+            const isActive = activeChat?.id === group.groupId;
+            const unread = group.unreadMessagesCount || 0;
+            return (
+                <button
+                    key={group.groupId}
+                    className={`${styles.item} ${isActive ? styles.activeItem : ''}`}
+                    onClick={() => openChat({ type: 'group', id: group.groupId, data: group })}
+                >
+                  <Avatar name={group.name} src={group.avatarUrl} size={38} />
+                  <div className={styles.itemContent}>
+                    <div className={styles.itemTop}>
+                      <span className={styles.itemName}>{group.name}</span>
+                      {group.lastMessageDate && (
+                          <span className={styles.itemTime}>
+                      {formatDistanceToNow(new Date(group.lastMessageDate), { addSuffix: false })}
+                    </span>
+                      )}
+                    </div>
+                    <div className={styles.itemBottom}>
+                      <span className={styles.itemPreview}>{group.lastMessage || 'No messages yet'}</span>
+                      {unread > 0 && <span className={styles.badge}>{unread}</span>}
+                    </div>
+                  </div>
+                </button>
+            );
+          })}
+        </div>
+
+        <div className={styles.userBar}>
+          <Avatar name={user?.username} size={34} online={true} />
+          <div className={styles.userInfo}>
+            <span className={styles.userName}>{user?.username}</span>
+            <span className={styles.userStatus}>Online</span>
+          </div>
+          <button className={styles.iconBtn} onClick={logout} title="Sign out">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </aside>
+  );
+}

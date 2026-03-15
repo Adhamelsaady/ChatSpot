@@ -12,7 +12,10 @@ public class MessageDocument
     public string SenderId { get; set; } = string.Empty;        
 
     [BsonElement("receiverId")]
-    public string? ReceiverId { get; set; }                     
+    public string? ReceiverId { get; set; }         
+    
+    [BsonElement]
+    public string SenderName { get; set; } = string.Empty;
 
     [BsonElement("groupId")]
     public string? GroupId { get; set; }        

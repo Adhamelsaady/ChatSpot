@@ -1,0 +1,160 @@
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 1px 0;
+  position: relative;
+  animation: messageIn 0.2s ease;
+}
+
+.mine {
+  flex-direction: row-reverse;
+}
+.readReceipt {
+  font-size: 10px;
+  opacity: 0.8;
+  margin-left: 2px;
+}
+.theirs {
+  flex-direction: row;
+}
+
+.avatarSlot {
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.bubbleWrap {
+  display: flex;
+  flex-direction: column;
+  max-width: 65%;
+  gap: 2px;
+}
+
+.mine .bubbleWrap {
+  align-items: flex-end;
+}
+
+.senderName {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 0 4px;
+  margin-bottom: 2px;
+}
+
+.replyQuote {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  background: var(--bg-elevated);
+  border-radius: 8px 8px 0 0;
+  padding: 6px 10px;
+  max-width: 100%;
+}
+
+.replyBar {
+  width: 2px;
+  min-height: 20px;
+  background: var(--accent);
+  border-radius: 1px;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.replyQuoteText {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bubble {
+  padding: 9px 13px;
+  border-radius: 18px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+.bubbleMine {
+  background: var(--accent);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.bubbleTheirs {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+}
+
+.content {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.time {
+  font-size: 10px;
+  opacity: 0.7;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-bottom: -1px;
+}
+
+.edited {
+  font-style: italic;
+}
+
+/* Deleted */
+.deleted {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 6px 0;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  opacity: 0;
+  animation: fadeIn 0.1s ease forwards;
+}
+
+.row:hover .actions {
+  opacity: 1;
+}
+
+.actionsMine { flex-direction: row; }
+.actionsTheirs { flex-direction: row-reverse; }
+
+.actionBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.actionBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.deleteBtn:hover {
+  color: var(--danger);
+  border-color: rgba(248, 113, 113, 0.3);
+}

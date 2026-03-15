@@ -65,6 +65,7 @@ public class ChatService : IChatService
         string conversationId)
     {
         var messageDocument = _mapper.Map<MessageDocument>(messageForSending);
+        messageDocument.SenderName = (await _userRepository.GetByIdAsync(currentUser)).UserName;
         string? replyPreview = null;
         if (!string.IsNullOrEmpty(messageForSending.ReplyToId))
         {
