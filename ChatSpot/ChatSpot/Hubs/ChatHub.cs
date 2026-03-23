@@ -53,24 +53,24 @@ public class ChatHub : Hub
 
     public async Task JoinGroup(string groupId)
     { 
-        await Groups.AddToGroupAsync(Context.ConnectionId, $"group : {groupId}");
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"group:{groupId}");
     }
 
     public async Task LeaveGroup(string groupId)
     {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"group : {groupId}");
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"group:{groupId}");
     }
     
     public async Task SendGroupMessage(string groupId, MessageForSending messageForSending , MessageToReturnDto messageToReturnDto)
     {
         if (!Guid.TryParse(groupId, out var groupGuid)) return;
         if (!messageToReturnDto.IsSuccess) return;
-        await Clients.Group($"group : {groupId}")
+        await Clients.Group($"group:{groupId}")
             .SendAsync("ReceiveGroupMessage", groupId, messageToReturnDto);
     }
     public async Task MarkGroupRead(string groupId)
     {
-        await Clients.Group($"group : {groupId}")
+        await Clients.Group($"group:{groupId}")
             .SendAsync("GroupRead", groupId, Context.User?.FindFirstValue(ClaimTypes.NameIdentifier));
     }
     

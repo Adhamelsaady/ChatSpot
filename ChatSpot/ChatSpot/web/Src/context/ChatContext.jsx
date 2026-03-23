@@ -137,6 +137,73 @@ export const ChatProvider = ({ children }) => {
       });
       hub.on('UserOnline', () => loadConversations());
       hub.on('UserOffline', () => loadConversations());
+      hub.on('MemberRemoved', (groupId, userId) => {
+        const current = activeChatRef.current;
+        if (current?.type === 'group' && current?.id === groupId) {
+          setMessages(prev => [...prev, {
+            id: `sys-${Date.now()}`,
+            content: `A member was removed from the group`,
+            isSystem: true,
+            timestamp: new Date().toISOString(),
+          }]);
+        }
+        loadGroups();
+      });
+
+      hub.on('MemberLeft', (groupId, userId) => {
+        const current = activeChatRef.current;
+        if (current?.type === 'group' && current?.id === groupId) {
+          setMessages(prev => [...prev, {
+            id: `sys-${Date.now()}`,
+            content: `A member left the group`,
+            isSystem: true,
+            timestamp: new Date().toISOString(),
+          }]);
+        }
+        loadGroups();
+      });
+
+      hub.on('MembersAdded', (groupId, userIds) => {
+        const current = activeChatRef.current;
+        if (current?.type === 'group' && current?.id === groupId) {
+          setMessages(prev => [...prev, {
+            id: `sys-${Date.now()}`,
+            content: `${userIds.length} member${userIds.length > 1 ? 's' : ''} added to the group`,
+            isSystem: true,
+            timestamp: new Date().toISOString(),
+          }]);
+        }
+        loadGroups();
+      });
+
+      hub.on('MemberRoleChanged', (groupId, userId, newRole) => {
+        const current = activeChatRef.current;
+        if (current?.type === 'group' && current?.id === groupId) {
+          setMessages(prev => [...prev, {
+            id: `sys-${Date.now()}`,
+            content: `A member's role was changed to ${newRole}`,
+            isSystem: true,
+            timestamp: new Date().toISOString(),
+          }]);
+        }
+      });
+
+      hub.on('RemovedFromGroup', (groupId) => {
+        loadGroups();
+        const current = activeChatRef.current;
+        if (current?.type === 'group' && current?.id === groupId) {
+          openChat(null);
+        }
+      });
+
+      hub.on('AddedToGroup', (group) => {
+        loadGroups();
+      });
+
+      hub.on('RoleChanged', (groupId, newRole) => {
+        // Current user's role changed - reload groups
+        loadGroups();
+      });
     };
 
     setup();
@@ -149,7 +216,9 @@ export const ChatProvider = ({ children }) => {
       if (hub) {
         ['ReceiveDirectMessage','ReceiveGroupMessage','DirectMessageDeleted',
           'GroupMessageDeleted','UserTyping','UserStoppedTyping',
-          'UserTypingInGroup','UserStoppedTypingInGroup','UserOnline','UserOffline']
+          'UserTypingInGroup','UserStoppedTypingInGroup','UserOnline','UserOffline',
+          'MemberRemoved','MemberLeft','MembersAdded','MemberRoleChanged',
+          'RemovedFromGroup','AddedToGroup','RoleChanged']
             .forEach(e => hub.off(e));
       }
     };
