@@ -33,13 +33,20 @@ export default function ChatWindow() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const chatName = activeChat?.type === 'group'
-    ? activeChat.data?.name
-    : activeChat?.data?.otherUserName || 'Conversation';
+    const chatName = activeChat?.type === 'group'
+        ? activeChat.data?.name
+        : activeChat?.data?.user?.userName || 'Unknown';
 
-  const chatSub = activeChat?.type === 'group'
-    ? `${activeChat.data?.memberCount || ''} members`
-    : activeChat?.data?.isOnline ? 'Online' : 'Offline';
+    const isOnline = activeChat?.data?.user?.status === 'Online';
+    const lastSeen = activeChat?.data?.user?.lastSeen;
+
+    const chatSub = activeChat?.type === 'group'
+        ? `${activeChat.data?.memberCount || ''} members`
+        : isOnline
+            ? 'Online'
+            : lastSeen
+                ? `Last seen ${new Date(lastSeen).toLocaleString()}`
+                : 'Offline';
 
   return (
     <div className={styles.window}>
