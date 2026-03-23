@@ -14,7 +14,9 @@ public class MappingProfile : Profile
         CreateMap<MessageForSending , MessageDocument>();
         CreateMap<MessageDocument, MessageToReturnDto>();
         CreateMap<ApplicationUser , UserDto>();
-        CreateMap<GroupToCreateDto , Group>();
+        CreateMap<GroupToCreateDto, Group>()
+            .ForMember(dest => dest.Members, opt => opt.MapFrom(src => 
+                src.Members.Select(id => new GroupMember { UserId = id })));
         CreateMap<GroupMemberDto, GroupMember>().ReverseMap();
         CreateMap<Group, GroupToReturnDto>().ForMember(dest => dest.GroupMemberDtos, 
             opt => opt.MapFrom(src => src.Members));

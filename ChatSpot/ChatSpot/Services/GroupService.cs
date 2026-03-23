@@ -33,27 +33,54 @@ public class GroupService : IGroupService
 
     public async Task<GroupToReturnDto> CreateGroup(GroupToCreateDto createGroupDto, string currentUserId)
     { 
-        var allMemberIds = createGroupDto.Members.Distinct().Where(id => id != currentUserId).ToList();
+        // 1. Initialize the Group and generate the ID immediately
         var group = _mapper.Map<Group>(createGroupDto);
+        group.GroupId = Guid.NewGuid(); // Explicitly set this early
         group.CreatorId = currentUserId;
         group.CreatedAt = DateTime.UtcNow;
-        var members = new List<GroupMember>
-        {
-            new()
-            {
-                GroupId = group.GroupId, UserId = currentUserId, Role = GroupRole.owner, JoinedAt = DateTime.UtcNow
-            }
-        };
-        foreach (var uid in createGroupDto.Members.Distinct().Where(id => id != currentUserId))
-            members.Add(new GroupMember()
-                { GroupId = group.GroupId, UserId = uid, Role = GroupRole.member, JoinedAt = DateTime.UtcNow });
 
-        await _groupRepository.CreateAsync(group, members);
+        // 2. Prepare the Unique Member List
+        // Filter out the creator from the DTO list to avoid adding them twice
+        var otherMemberIds = createGroupDto.Members
+            .Distinct()
+            .Where(id => id != currentUserId)
+            .ToList();
+
+        // 3. Construct the Member Entities
+        var memberEntities = new List<GroupMember>
+        {
+            new() { GroupId = group.GroupId, UserId = currentUserId, Role = GroupRole.owner, JoinedAt = DateTime.UtcNow }
+        };
+
+        foreach (var uid in otherMemberIds)
+        {
+            memberEntities.Add(new GroupMember 
+            { 
+                GroupId = group.GroupId, 
+                UserId = uid, 
+                Role = GroupRole.member, 
+                JoinedAt = DateTime.UtcNow 
+            });
+        }
+
+        // 4. Persistence
+        // Pass the list to SQL. 
+        // Crucially: Make sure CreateAsync does NOT call .AddRange(members) if 'group.Members' is already populated.
+        await _groupRepository.CreateAsync(group, memberEntities);
+    
+        // Now MongoDB gets a valid Guid string instead of null
         await _groupMetaDataRepository.GetOrCreateAsync(group.GroupId.ToString());
+
+        // 5. Fetch and Return
         var fullGroup = await _groupRepository.GetByIdWithMembersAsync(group.GroupId);
         var groupToReturnDto = _mapper.Map<GroupToReturnDto>(fullGroup);
-        foreach (var memberId in allMemberIds)
+
+        // 6. Notify (Send to ALL members, including those just added)
+        foreach (var memberId in otherMemberIds)
+        {
             await _hub.Clients.User(memberId).SendAsync("AddedToGroup", groupToReturnDto);
+        }
+
         return groupToReturnDto;
     }
 

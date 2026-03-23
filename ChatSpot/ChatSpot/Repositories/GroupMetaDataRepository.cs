@@ -24,6 +24,7 @@ public class GroupMetaDataRepository : IGroupMetaDataRepository
 
     public async Task<GroupChatMetaDocument> GetOrCreateAsync(string groupId)
     {
+       
         var filter = Builders<GroupChatMetaDocument>.Filter.Eq(x => x.GroupId, groupId);
         var update = Builders<GroupChatMetaDocument>.Update
             .SetOnInsert(x => x.GroupId, groupId);

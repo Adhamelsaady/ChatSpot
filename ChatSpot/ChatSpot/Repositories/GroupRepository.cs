@@ -61,7 +61,6 @@ public class GroupRepository : IGroupRepository
     public async Task<Group> CreateAsync(Group group, List<GroupMember> members)
     {
         _db.Groups.Add(group);
-        _db.GroupMembers.AddRange(members);
         await _db.SaveChangesAsync();
         return group;
     }
