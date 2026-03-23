@@ -49,7 +49,7 @@ public class GroupService : IGroupService
                 { GroupId = group.GroupId, UserId = uid, Role = GroupRole.member, JoinedAt = DateTime.UtcNow });
 
         await _groupRepository.CreateAsync(group, members);
-        await _groupMetaDataRepository.GetOrCreateAsync(group.GroupId);
+        await _groupMetaDataRepository.GetOrCreateAsync(group.GroupId.ToString());
         var fullGroup = await _groupRepository.GetByIdWithMembersAsync(group.GroupId);
         var groupToReturnDto = _mapper.Map<GroupToReturnDto>(fullGroup);
         foreach (var memberId in allMemberIds)

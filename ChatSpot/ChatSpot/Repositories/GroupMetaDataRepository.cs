@@ -7,7 +7,7 @@ namespace ChatSpot.Repositories;
 public class GroupMetaDataRepository : IGroupMetaDataRepository
 {
     private readonly MongoDbContext _db;
-    private IGroupMetaDataRepository _groupMetaDataRepositoryImplementation;
+
 
     public  GroupMetaDataRepository(MongoDbContext db)
     {
@@ -18,16 +18,23 @@ public class GroupMetaDataRepository : IGroupMetaDataRepository
 
     public Task<GroupChatMetaDocument> GetOrCreateAsync(Guid groupId)
     {
-        return _groupMetaDataRepositoryImplementation.GetOrCreateAsync(groupId);
+        throw new NotImplementedException();
     }
+
 
     public async Task<GroupChatMetaDocument> GetOrCreateAsync(string groupId)
     {
-        var meta = await GetByGroupIdAsync(groupId);
-        if (meta != null) return meta;
-        meta = new GroupChatMetaDocument { GroupId = groupId };
-        await _db.GroupChatMeta.InsertOneAsync(meta);
-        return meta;
+        var filter = Builders<GroupChatMetaDocument>.Filter.Eq(x => x.GroupId, groupId);
+        var update = Builders<GroupChatMetaDocument>.Update
+            .SetOnInsert(x => x.GroupId, groupId);
+
+        var options = new FindOneAndUpdateOptions<GroupChatMetaDocument>
+        {
+            IsUpsert = true,
+            ReturnDocument = ReturnDocument.After
+        };
+
+        return await _db.GroupChatMeta.FindOneAndUpdateAsync(filter, update, options);
     }
     public async Task<IList<GroupChatMetaDocument>> GetByGroupIdsAsync(IEnumerable<string> groupIds)
     {
@@ -41,6 +48,10 @@ public class GroupMetaDataRepository : IGroupMetaDataRepository
     public async Task MarkGroupMessagesAsRead(string groupId , string userId)
     {
         var meta = await GetByGroupIdAsync(groupId);
+        if (meta == null)
+        {
+            meta = await GetOrCreateAsync(groupId);
+        }
         var lastMessageId = meta.LastMessageId;
         var update = Builders<GroupChatMetaDocument>.Update
             .Set(c => c.UnreadCount[userId], 0)
