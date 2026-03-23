@@ -61,6 +61,7 @@ public class GroupRepository : IGroupRepository
     public async Task<Group> CreateAsync(Group group)
     {
         _db.Groups.Add(group);
+        
         await _db.SaveChangesAsync();
         return group;
     }
@@ -71,6 +72,12 @@ public class GroupRepository : IGroupRepository
         await _db.SaveChangesAsync();
     }
 
+    public async Task SetUserRole(Guid groupId, string userId, GroupRole role)
+    {
+        var member = await _db.GroupMembers.FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == userId);
+        member.Role = role;
+        await _db.SaveChangesAsync();
+    }
 
     public async Task<bool> AddMembersAsync(Guid groupId, List<string> userIds, string requesterId)
     {

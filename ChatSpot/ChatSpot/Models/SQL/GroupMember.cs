@@ -16,7 +16,7 @@ public class GroupMember
 
 public enum GroupRole
 {
-    owner,
+    member,
     admin,
-    member
+    owner
 }

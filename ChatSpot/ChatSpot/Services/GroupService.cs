@@ -32,7 +32,8 @@ public class GroupService : IGroupService
     }
 
     public async Task<GroupToReturnDto> CreateGroup(GroupToCreateDto createGroupDto, string currentUserId)
-    { 
+    {
+        createGroupDto.Members.Add(currentUserId);
         var group = _mapper.Map<Group>(createGroupDto);
         group.GroupId = Guid.NewGuid(); 
         group.CreatorId = currentUserId;
@@ -42,26 +43,13 @@ public class GroupService : IGroupService
             .Where(id => id != currentUserId)
             .ToList();
 
-        var memberEntities = new List<GroupMember>
-        {
-            new() { GroupId = group.GroupId, UserId = currentUserId, Role = GroupRole.owner, JoinedAt = DateTime.UtcNow }
-        };
-
-        foreach (var uid in otherMemberIds)
-        {
-            memberEntities.Add(new GroupMember 
-            { 
-                GroupId = group.GroupId, 
-                UserId = uid, 
-                Role = GroupRole.member, 
-                JoinedAt = DateTime.UtcNow 
-            });
-        }
-
+      
         await _groupRepository.CreateAsync(group);
     
         await _groupMetaDataRepository.GetOrCreateAsync(group.GroupId.ToString());
-
+        
+        await _groupRepository.SetUserRole(group.GroupId, currentUserId , GroupRole.owner);
+        
         var fullGroup = await _groupRepository.GetByIdWithMembersAsync(group.GroupId);
         var groupToReturnDto = _mapper.Map<GroupToReturnDto>(fullGroup);
 

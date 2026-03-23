@@ -12,6 +12,7 @@ public interface IGroupRepository
     Task<PagedResult<Group>> GetUserGroupsAsync(BaseResourceParameter baseResourceParameter , string userId);
     Task<Group> CreateAsync(Group group);
     Task UpdateAsync(Group group);
+    Task SetUserRole(Guid groupId, string userId, GroupRole role);
     Task<bool> AddMembersAsync(Guid groupId, List<string> userIds, string requesterId);
     Task<bool> RemoveMemberAsync(Guid groupId, string userId, string requesterId);
     Task<bool> UpdateMemberRoleAsync(Guid groupId, string userId, GroupRole role, string requesterId);
