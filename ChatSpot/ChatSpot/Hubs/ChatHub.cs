@@ -12,9 +12,7 @@ public class ChatHub : Hub
 {
     private readonly IConnectionService _connectionService;
 
-    public ChatHub(IChatService chatService,
-        IGroupService groupService, 
-        IConnectionService connectionService)
+    public ChatHub(IConnectionService connectionService)
     {
         _connectionService = connectionService;
     }

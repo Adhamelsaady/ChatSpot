@@ -10,7 +10,7 @@ public class ApplicationUser : IdentityUser
 
     public string ProfilePicture { get; set; } = string.Empty;
 
-    [MaxLength(20)]
+    
     public bool isOnline { get; set; } = false;
 
     public DateTime LastSeen { get; set; } = DateTime.UtcNow;

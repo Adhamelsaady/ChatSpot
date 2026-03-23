@@ -1,4 +1,5 @@
-﻿using ChatSpot.Contracts.Services;
+﻿using ChatSpot.Contracts.Persistence;
+using ChatSpot.Contracts.Services;
 using ChatSpot.Models.SQL;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,11 +7,13 @@ namespace ChatSpot.Services;
 
 public class ConnectionService : IConnectionService
 {
-    private readonly ChatSpotDbContext _db; 
-    
-    public ConnectionService(ChatSpotDbContext db)
+    private readonly ChatSpotDbContext _db;
+    private readonly IBaseRepository<ApplicationUser> _userRepository;
+
+    public ConnectionService(ChatSpotDbContext db, IBaseRepository<ApplicationUser> userRepository)
     {
         _db = db;
+        _userRepository = userRepository;
     }
 
     public async Task ConnectAsync(string userId, string connectionId)
@@ -35,6 +38,14 @@ public class ConnectionService : IConnectionService
                 IsConnected = true
             });
         }
+
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user != null)
+        {
+            user.isOnline = true;
+         
+        }
+
         await _db.SaveChangesAsync();
     }
 
@@ -42,13 +53,19 @@ public class ConnectionService : IConnectionService
     {
         var connection = await _db.UserConnections
             .FirstOrDefaultAsync(c => c.ConnectionId == connectionId && c.IsConnected);
-        if (connection != null)
+        if (connection == null) return;
+
+        connection.IsConnected = false;
+        connection.DisconnectedAt = DateTime.UtcNow;
+        _db.UserConnections.Update(connection);
+        var user = await _userRepository.GetByIdAsync(connection.UserId);
+        if (user != null)
         {
-            connection.IsConnected = false;
-            connection.DisconnectedAt = DateTime.UtcNow;
-            _db.UserConnections.Update(connection);
-            await _db.SaveChangesAsync();
+            user.isOnline = false;
+            user.LastSeen = DateTime.UtcNow;
         }
+
+        await _db.SaveChangesAsync();
     }
 
     public async Task<List<UserConnection>> GetOnlineUsersAsync()
