@@ -10,7 +10,7 @@ public interface IGroupRepository
     Task<Group?> GetByIdAsync(Guid id);
     Task<Group?> GetByIdWithMembersAsync(Guid id);
     Task<PagedResult<Group>> GetUserGroupsAsync(BaseResourceParameter baseResourceParameter , string userId);
-    Task<Group> CreateAsync(Group group, List<GroupMember> members);
+    Task<Group> CreateAsync(Group group);
     Task UpdateAsync(Group group);
     Task<bool> AddMembersAsync(Guid groupId, List<string> userIds, string requesterId);
     Task<bool> RemoveMemberAsync(Guid groupId, string userId, string requesterId);
