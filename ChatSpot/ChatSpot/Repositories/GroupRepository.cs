@@ -109,6 +109,7 @@ public class GroupRepository : IGroupRepository
             if (requester == null || requester.Role == GroupRole.member) return false;
         }
 
+        // todo : make this soft delete
         await _db.GroupMembers
             .Where(m => m.GroupId == groupId && m.UserId == userId)
             .ExecuteDeleteAsync();
@@ -142,6 +143,7 @@ public class GroupRepository : IGroupRepository
 
     public async Task<bool> RemoveMemberAsync(Guid groupId, string userId)
     {
+        // todo : make this soft delete
         var member = await _db.GroupMembers
             .FirstOrDefaultAsync(gm => gm.GroupId == groupId && gm.UserId == userId);
         if (member == null) return false;
