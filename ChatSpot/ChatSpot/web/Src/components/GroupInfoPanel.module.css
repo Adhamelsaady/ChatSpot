@@ -283,3 +283,29 @@
 
 .confirmAddBtn:hover:not(:disabled) { background: var(--accent-bright); }
 .confirmAddBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+.memberActions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.member:hover .memberActions { opacity: 1; }
+
+.roleBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.roleBtn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+}

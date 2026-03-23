@@ -100,6 +100,14 @@ export default function GroupInfoPanel({ groupId, onClose }) {
             setMembers(prev => prev.filter(m => m.userId !== userId));
         } catch (e) { console.error(e); }
     };
+    const handleToggleRole = async (userId) => {
+        try {
+            await groupApi.changeRole(groupId, userId);
+            await load(); 
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const handleLeave = async () => {
         if (!confirm('Leave this group?')) return;
@@ -214,11 +222,20 @@ export default function GroupInfoPanel({ groupId, onClose }) {
                   </span>
                                 </div>
                                 {canManage && !isMe && roleNum !== 2 && (
-                                    <button className={styles.removeBtn} onClick={() => handleRemove(m.userId)} title="Remove">
-                                        <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                                        </svg>
-                                    </button>
+                                    <div className={styles.memberActions}>
+                                        <button
+                                            className={styles.roleBtn}
+                                            onClick={() => handleToggleRole(m.userId)}
+                                            title={roleNum === 1 ? 'Demote to member' : 'Promote to admin'}
+                                        >
+                                            {roleNum === 1 ? '🛡️→' : '→🛡️'}
+                                        </button>
+                                        <button className={styles.removeBtn} onClick={() => handleRemove(m.userId)} title="Remove">
+                                            <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         );

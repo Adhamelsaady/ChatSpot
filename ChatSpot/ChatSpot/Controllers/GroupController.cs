@@ -97,7 +97,7 @@ public class GroupController : ControllerBase
     {
         var requesterId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var result = await _groupService.ToggleMemberAdminRoleAsync(groupId, userId, requesterId);
-        Console.WriteLine(result.Message);
+
         if (!result.IsSuccess) return Forbid();
         return Ok(result);
     }
