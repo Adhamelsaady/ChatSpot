@@ -1,0 +1,8 @@
+﻿[build]
+  base = "ChatSpot/ChatSpot/web"
+  command = "npm install && npm run build"
+  publish = "ChatSpot/ChatSpot/web/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--version"
