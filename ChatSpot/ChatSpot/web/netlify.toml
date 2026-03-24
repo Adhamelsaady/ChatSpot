@@ -1,6 +1,4 @@
 ﻿[build]
-  # This is the root of your frontend project
-  base = "ChatSpot/ChatSpot/web"
   
   # Command runs INSIDE the base directory
   command = "npm install && npm run build"
