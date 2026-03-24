@@ -1,12 +1,7 @@
 ﻿[build]
-  
-  # Command runs INSIDE the base directory
-  command = "npm install && npm run build"
-  
-  # Publish directory is relative to the BASE directory
-  # If your build creates a 'dist' folder inside 'web', just use "dist"
+  command = "npm run build"
   publish = "dist"
-
+  
 [build.environment]
   NODE_VERSION = "20"
 
