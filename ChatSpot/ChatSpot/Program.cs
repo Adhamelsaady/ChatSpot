@@ -39,7 +39,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-// then later:
 app.MapControllers();
 app.MapHub<ChatHub>("/hubs/chat");
 
