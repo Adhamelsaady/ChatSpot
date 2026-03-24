@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://localhost:7184';
+const BASE_URL = 'https://chatspot-production-640b.up.railway.app';
 
 export const api = axios.create({
   baseURL: BASE_URL,

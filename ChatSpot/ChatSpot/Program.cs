@@ -27,9 +27,9 @@ builder.Services.AddSignalR();
 var app = builder.Build();
 
 
-    app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowReact");
