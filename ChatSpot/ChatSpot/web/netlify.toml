@@ -1,8 +1,19 @@
 ﻿[build]
+  # This is the root of your frontend project
   base = "ChatSpot/ChatSpot/web"
+  
+  # Command runs INSIDE the base directory
   command = "npm install && npm run build"
-  publish = "ChatSpot/ChatSpot/web/dist"
+  
+  # Publish directory is relative to the BASE directory
+  # If your build creates a 'dist' folder inside 'web', just use "dist"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "20"
-  NPM_FLAGS = "--version"
+
+[[redirects]]
+  # This fixes the 404 on refresh for SPAs
+  from = "/*"
+  to = "/index.html"
+  status = 200
