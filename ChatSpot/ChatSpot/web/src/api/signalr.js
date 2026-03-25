@@ -1,13 +1,13 @@
 import * as signalR from '@microsoft/signalr';
 
-const BASE_URL = 'https://chatspot-production-640b.up.railway.app/chatHub';
+const BASE_URL = 'https://chatspot-production-640b.up.railway.app';
 
 let connection = null;
 
 export const getHubConnection = () => {
   if (!connection) {
     connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${BASE_URL}/hubs/chat`, {
+      .withUrl(`${BASE_URL}/chatHub`, {
         accessTokenFactory: () => localStorage.getItem('accessToken'),
         skipNegotiation: false,
       })
