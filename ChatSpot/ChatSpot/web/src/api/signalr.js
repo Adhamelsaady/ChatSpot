@@ -1,6 +1,6 @@
 import * as signalR from '@microsoft/signalr';
 
-const BASE_URL = 'https://localhost:7184';
+const BASE_URL = 'https://chatspot-production-640b.up.railway.app/chatHub';
 
 let connection = null;
 

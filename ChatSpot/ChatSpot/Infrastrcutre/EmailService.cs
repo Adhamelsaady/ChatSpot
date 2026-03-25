@@ -1,11 +1,5 @@
 ﻿using ChatSpot.Contracts.Infrastructure;
-using System.Net.Mail;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using MimeKit;
-using SmtpClient = MailKit.Net.Smtp.SmtpClient;
+
 
 namespace ChatSpot.Infrastrcutre;
 
