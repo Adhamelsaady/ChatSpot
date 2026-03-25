@@ -1,21 +1,23 @@
-﻿import { defineConfig } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+
+// Dev-only: proxy to ASP.NET. Use HTTP (5215) — same as launchSettings "https" profile's http URL — so Node
+// doesn't need to trust the dev HTTPS cert. If you only run the "http" profile, it's still localhost:5215.
+const API_DEV_TARGET = 'http://localhost:5215'
 
 export default defineConfig({
     plugins: [react()],
     server: {
         port: 4000,
-        strictPort: true,
+        strictPort: false,
         proxy: {
             '/api': {
-                target: 'https://localhost:7184',
+                target: API_DEV_TARGET,
                 changeOrigin: true,
-                secure: false,
             },
-            '/chathub': {
-                target: 'https://localhost:7184',
+            '/chatHub': {
+                target: API_DEV_TARGET,
                 changeOrigin: true,
-                secure: false,
                 ws: true,
             }
         }

@@ -1,13 +1,17 @@
 import * as signalR from '@microsoft/signalr';
 
-const BASE_URL = 'https://chatspot-production-640b.up.railway.app';
+// Dev: same origin so Vite proxies /chatHub → ASP.NET. Prod: set VITE_SIGNALR_URL or use default host.
+const hubBase =
+  import.meta.env.VITE_SIGNALR_URL ||
+  (import.meta.env.DEV ? '' : 'https://chatspot-production-640b.up.railway.app');
+const hubUrl = hubBase ? `${hubBase.replace(/\/+$/, '')}/chatHub` : '/chatHub';
 
 let connection = null;
 
 export const getHubConnection = () => {
   if (!connection) {
     connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${BASE_URL}/chatHub`, {
+      .withUrl(hubUrl, {
         accessTokenFactory: () => localStorage.getItem('accessToken'),
         skipNegotiation: false,
       })
