@@ -42,6 +42,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.UseCors("SignalRPolicy");
-app.MapHub<ChatHub>("/hubs/chat");
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
