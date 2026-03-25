@@ -64,37 +64,30 @@ public class EmailService : IEmailService
 
         await SendEmailAsync(email, subject, body);
     }
-
     private async Task SendEmailAsync(string toEmail, string subject, string body)
     {
         var emailSettings = _configuration.GetSection("EmailSettings");
-        var otpMatch = System.Text.RegularExpressions.Regex.Match(
-            body,
-            @"letter-spacing: 8px;[^>]*>(\d{6})</h1>");
-        var otp = otpMatch.Success ? otpMatch.Groups[1].Value : "N/A";
-        var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(
-            emailSettings["SenderName"],
-            emailSettings["SenderEmail"]));
-        message.To.Add(new MailboxAddress("", toEmail));
-        message.Subject = subject;
-        var bodyBuilder = new BodyBuilder
+
+        var payload = new
         {
-            HtmlBody = body
+            sender = new { 
+                name = emailSettings["SenderName"], 
+                email = emailSettings["SenderEmail"] 
+            },
+            to = new[] { new { email = toEmail } },
+            subject = subject,
+            htmlContent = body
         };
-        message.Body = bodyBuilder.ToMessageBody();
 
-        using var client = new SmtpClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.brevo.com/v3/smtp/email");
+        request.Headers.Add("api-key", emailSettings["ApiKey"]);
+        request.Content = new StringContent(
+            System.Text.Json.JsonSerializer.Serialize(payload),
+            System.Text.Encoding.UTF8,
+            "application/json");
 
-        await client.ConnectAsync(
-            emailSettings["SmtpServer"],
-            int.Parse(emailSettings["SmtpPort"]!),
-            SecureSocketOptions.SslOnConnect);
-        await client.AuthenticateAsync(
-            emailSettings["SmtpUsername"],
-            emailSettings["SmtpPassword"]);
-        await client.SendAsync(message);
-
-        await client.DisconnectAsync(true);
+        using var httpClient = new HttpClient();
+        var response = await httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
     }
 }
