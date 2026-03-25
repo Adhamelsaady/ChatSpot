@@ -96,7 +96,7 @@ namespace ChatSpot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ApplicationUser");
+                    b.ToTable("ApplicationUser", (string)null);
                 });
 
             modelBuilder.Entity("ChatSpot.Models.SQL.Group", b =>
@@ -133,7 +133,7 @@ namespace ChatSpot.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Groups");
+                    b.ToTable("Groups", (string)null);
                 });
 
             modelBuilder.Entity("ChatSpot.Models.SQL.GroupMember", b =>
@@ -154,7 +154,7 @@ namespace ChatSpot.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GroupMembers");
+                    b.ToTable("GroupMembers", (string)null);
                 });
 
             modelBuilder.Entity("ChatSpot.Models.SQL.RefreshToken", b =>
@@ -191,7 +191,7 @@ namespace ChatSpot.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("ChatSpot.Models.SQL.UserConnection", b =>
@@ -219,7 +219,7 @@ namespace ChatSpot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserConnections");
+                    b.ToTable("UserConnections", (string)null);
                 });
 
             modelBuilder.Entity("ChatSpot.Models.SQL.Group", b =>

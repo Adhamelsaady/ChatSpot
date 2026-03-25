@@ -7,7 +7,10 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowReact", p =>
-        p.WithOrigins("http://localhost:4000")
+        p.WithOrigins(
+                "http://localhost:5173",
+                "https://chatspot-liart.vercel.app"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()));

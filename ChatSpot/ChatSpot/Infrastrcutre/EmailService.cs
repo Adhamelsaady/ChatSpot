@@ -89,7 +89,7 @@ public class EmailService : IEmailService
         await client.ConnectAsync(
             emailSettings["SmtpServer"],
             int.Parse(emailSettings["SmtpPort"]!),
-            SecureSocketOptions.StartTls);
+            SecureSocketOptions.SslOnConnect);
         await client.AuthenticateAsync(
             emailSettings["SmtpUsername"],
             emailSettings["SmtpPassword"]);
