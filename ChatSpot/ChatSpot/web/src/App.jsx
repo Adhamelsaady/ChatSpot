@@ -19,21 +19,27 @@ const PublicRoute = ({ children }) => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-          <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-          <Route path="/confirm-email" element={<PublicRoute><ConfirmEmailPage /></PublicRoute>} />
-          <Route path="/*" element={
-            <ProtectedRoute>
-              <ChatProvider>
-                <ChatPage />
-              </ChatProvider>
-            </ProtectedRoute>
-          } />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <div className="app-shell">
+      <AuthProvider>
+        <div className="app-router">
+          <BrowserRouter>
+            <div className="route-outlet">
+              <Routes>
+                <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+                <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+                <Route path="/confirm-email" element={<PublicRoute><ConfirmEmailPage /></PublicRoute>} />
+                <Route path="/*" element={
+                  <ProtectedRoute>
+                    <ChatProvider>
+                      <ChatPage />
+                    </ChatProvider>
+                  </ProtectedRoute>
+                } />
+              </Routes>
+            </div>
+          </BrowserRouter>
+        </div>
+      </AuthProvider>
+    </div>
   );
 }

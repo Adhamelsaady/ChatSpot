@@ -1,3 +1,14 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  animation: fadeIn 0.2s ease;
+}
+
 .panel {
   width: 260px;
   min-width: 260px;
@@ -9,12 +20,70 @@
   animation: slideIn 0.2s ease;
 }
 
+.panelSheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  width: 100%;
+  min-width: 0;
+  max-height: min(85vh, 100dvh - env(safe-area-inset-bottom, 0px));
+  z-index: 51;
+  border-left: none;
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.4);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: sheetUp 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .panelSheet {
+    animation: none;
+  }
+}
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.85;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 .panelHeader {
   padding: 16px 16px 12px;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.headerSpacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.sheetClose {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: background var(--transition), color var(--transition);
+}
+
+.sheetClose:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .panelTitle {
@@ -102,6 +171,13 @@
 
 .member:hover .removeBtn { opacity: 1; }
 
+@media (hover: none) {
+  .removeBtn,
+  .memberActions {
+    opacity: 1;
+  }
+}
+
 .removeBtn:hover {
   background: rgba(248,113,113,0.15);
   color: var(--danger);
@@ -127,7 +203,6 @@
 }
 
 .addBtn {
-  margin-left: auto;
   width: 24px;
   height: 24px;
   border-radius: var(--radius-sm);

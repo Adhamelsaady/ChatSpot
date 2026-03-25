@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../api/client';
+import BrandMark from '../components/BrandMark';
 import styles from './Auth.module.css';
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -27,13 +28,10 @@ export default function RegisterPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.bg}>
-        <div className={styles.orb1} />
-        <div className={styles.orb2} />
-      </div>
+      <div className={styles.bg} aria-hidden />
       <div className={styles.card}>
         <div className={styles.logo}>
-          <span className={styles.logoIcon}>◈</span>
+          <BrandMark size={28} className={styles.logoMark} />
           <span className={styles.logoText}>ChatSpot</span>
         </div>
         <h1 className={styles.title}>Create account</h1>

@@ -2,21 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
 import { formatDistanceToNow } from 'date-fns';
+import Avatar from './Avatar';
+import BrandMark from './BrandMark';
 import styles from './Sidebar.module.css';
-
-const Avatar = ({ name, src, size = 38, online }) => {
-  const initials = name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '?';
-  const colors = ['#7c6af0', '#6a8af0', '#f06a8a', '#f0a06a', '#6af0a8'];
-  const color = colors[(name?.charCodeAt(0) || 0) % colors.length];
-  return (
-      <div className={styles.avatar} style={{ width: size, height: size, background: src ? 'transparent' : color }}>
-        {src ? <img src={src} alt={name} /> : <span>{initials}</span>}
-        {online !== undefined && (
-            <span className={`${styles.dot} ${online ? styles.online : styles.offline}`} />
-        )}
-      </div>
-  );
-};
 
 export default function Sidebar({ onNewChat, onNewGroup }) {
   const { user, logout } = useAuth();
@@ -36,7 +24,7 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
       <aside className={styles.sidebar}>
         <div className={styles.header}>
           <div className={styles.logo}>
-            <span className={styles.logoIcon}>◈</span>
+            <BrandMark size={22} className={styles.logoMark} />
             <span className={styles.logoText}>ChatSpot</span>
           </div>
           <div className={styles.headerActions}>
