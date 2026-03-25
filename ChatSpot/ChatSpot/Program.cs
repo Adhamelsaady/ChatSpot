@@ -5,15 +5,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Must match the React dev origin (Vite uses 4000 in web/package.json; 5173 is Vite default).
+var reactOrigins = new[]
+{
+    "http://localhost:4000",
+    "http://localhost:5173",
+    "https://chatspot-liart.vercel.app",
+};
+
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowReact", p =>
-        p.WithOrigins(
-                "http://localhost:5173",
-                "https://chatspot-liart.vercel.app"
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials()));
+        p.WithOrigins(reactOrigins)
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()));
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -41,7 +47,6 @@ app.UseAuthorization();
 
 
 app.MapControllers();
-app.UseCors("SignalRPolicy");
 app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
