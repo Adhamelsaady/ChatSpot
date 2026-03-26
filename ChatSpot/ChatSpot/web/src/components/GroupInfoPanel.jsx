@@ -2,20 +2,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { groupApi, userApi } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
+import { useMediaQuery } from '../hooks/useMediaQuery';
+import Avatar from './Avatar';
 import styles from './GroupInfoPanel.module.css';
-
-const Avatar = ({ name, size = 32 }) => {
-    const initials = name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '?';
-    const colors = ['#7c6af0','#6a8af0','#f06a8a','#f0a06a','#6af0a8'];
-    const color = colors[(name?.charCodeAt(0) || 0) % colors.length];
-    return (
-        <div style={{
-            width: size, height: size, borderRadius: '50%', background: color,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 11, fontWeight: 700, color: 'white', fontFamily: 'var(--font-display)', flexShrink: 0,
-        }}>{initials}</div>
-    );
-};
 
 const roleMap = { 0: 'member', 1: 'admin', 2: 'owner' };
 const roleBadge = { owner: '👑', admin: '🛡️', member: '' };
@@ -23,6 +12,7 @@ const roleBadge = { owner: '👑', admin: '🛡️', member: '' };
 export default function GroupInfoPanel({ groupId, onClose }) {
     const { user } = useAuth();
     const { loadGroups, openChat } = useChat();
+    const isNarrow = useMediaQuery('(max-width: 767px)');
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [myRole, setMyRole] = useState(0);
@@ -121,11 +111,35 @@ export default function GroupInfoPanel({ groupId, onClose }) {
 
     const canManage = myRole === 2 || myRole === 1;
 
+    const panelClass = isNarrow ? `${styles.panel} ${styles.panelSheet}` : styles.panel;
+
     return (
-        <div className={styles.panel}>
+        <>
+            {isNarrow && (
+                <button
+                    type="button"
+                    className={styles.backdrop}
+                    onClick={onClose}
+                    aria-label="Close members panel"
+                />
+            )}
+            <div className={panelClass}>
             <div className={styles.panelHeader}>
                 <span className={styles.panelTitle}>Members</span>
                 <span className={styles.memberCount}>{members.length}</span>
+                <span className={styles.headerSpacer} aria-hidden />
+                {isNarrow && (
+                    <button
+                        type="button"
+                        className={styles.sheetClose}
+                        onClick={onClose}
+                        aria-label="Close"
+                    >
+                        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                )}
                 {canManage && !showAddMembers && (
                     <button className={styles.addBtn} onClick={() => setShowAddMembers(true)} title="Add members">
                         <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -254,5 +268,6 @@ export default function GroupInfoPanel({ groupId, onClose }) {
                 </button>
             )}
         </div>
+        </>
     );
 }

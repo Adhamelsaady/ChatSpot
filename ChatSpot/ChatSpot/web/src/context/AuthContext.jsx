@@ -33,7 +33,10 @@ export const AuthProvider = ({ children }) => {
   });
 
   const login = useCallback(async (email, password) => {
-    const { data } = await authApi.login({ email, password });
+    const { data } = await authApi.login({
+      email: email?.trim?.() ?? email,
+      password,
+    });
     localStorage.setItem('accessToken', data.token);
     localStorage.setItem('refreshToken', data.refreshToken);
     const payload = decodeJwt(data.token);

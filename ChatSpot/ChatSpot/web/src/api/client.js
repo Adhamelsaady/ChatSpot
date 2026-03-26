@@ -1,9 +1,12 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+// Backend is ASP.NET — not Node. In dev, leave VITE_API_URL unset so requests go to the Vite origin
+// and vite.config.js proxies /api → Kestrel. Set VITE_API_URL for production or a direct API host.
+const envBase = import.meta.env.VITE_API_URL;
+const BASE_URL = typeof envBase === 'string' ? envBase.replace(/\/+$/, '') : '';
 
 export const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: BASE_URL || undefined,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -44,7 +47,10 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         const accessToken = localStorage.getItem('accessToken');
-        const { data } = await axios.post(`${BASE_URL}/api/auth/refresh-token`, {
+        const refreshUrl = BASE_URL
+          ? `${BASE_URL}/api/auth/refresh-token`
+          : '/api/auth/refresh-token';
+        const { data } = await axios.post(refreshUrl, {
           token: accessToken,
           refreshToken,
         });

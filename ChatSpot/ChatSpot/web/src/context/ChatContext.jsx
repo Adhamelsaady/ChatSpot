@@ -5,6 +5,8 @@ import { useAuth } from './AuthContext';
 
 const ChatContext = createContext(null);
 
+const MESSAGE_PAGE_SIZE = 50;
+
 export const ChatProvider = ({ children }) => {
   const { user } = useAuth();
   const [conversations, setConversations] = useState([]);
@@ -12,6 +14,19 @@ export const ChatProvider = ({ children }) => {
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [messagesPage, setMessagesPage] = useState(1);
+  const [hasMoreOlder, setHasMoreOlder] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const messagesPageRef = useRef(1);
+  const hasMoreOlderRef = useRef(false);
+  const loadingOlderRef = useRef(false);
+
+  useEffect(() => {
+    messagesPageRef.current = messagesPage;
+  }, [messagesPage]);
+  useEffect(() => {
+    hasMoreOlderRef.current = hasMoreOlder;
+  }, [hasMoreOlder]);
   const [replyTo, setReplyTo] = useState(null);
   const [typingUsers, setTypingUsers] = useState([]);
   const activeChatRef = useRef(null);
@@ -40,19 +55,31 @@ export const ChatProvider = ({ children }) => {
   }, []);
 
   const loadMessages = useCallback(async (chat) => {
-    if (!chat) return;
+    if (!chat) {
+      setMessages([]);
+      setTypingUsers([]);
+      setLoadingMessages(false);
+      setMessagesPage(1);
+      messagesPageRef.current = 1;
+      setHasMoreOlder(false);
+      return;
+    }
     setLoadingMessages(true);
     setMessages([]);
     setTypingUsers([]);
+    setMessagesPage(1);
+    messagesPageRef.current = 1;
+    setHasMoreOlder(false);
     try {
       let data;
       if (chat.type === 'dm') {
-        ({ data } = await chatApi.getMessages(chat.id, { PageNumber: 1, PageSize: 50 }));
+        ({ data } = await chatApi.getMessages(chat.id, { PageNumber: 1, PageSize: MESSAGE_PAGE_SIZE }));
       } else {
-        ({ data } = await groupApi.getGroupMessages(chat.id, { PageNumber: 1, PageSize: 50 }));
+        ({ data } = await groupApi.getGroupMessages(chat.id, { PageNumber: 1, PageSize: MESSAGE_PAGE_SIZE }));
       }
       const msgs = Array.isArray(data) ? data : data.items || data.data || data.messages || [];
       setMessages([...msgs].reverse());
+      setHasMoreOlder(msgs.length >= MESSAGE_PAGE_SIZE);
     } catch (err) {
       console.error('Failed to load messages:', err);
     } finally {
@@ -62,6 +89,37 @@ export const ChatProvider = ({ children }) => {
       else loadGroups();
     }
   }, [loadConversations, loadGroups]);
+
+  const loadOlderMessages = useCallback(async () => {
+    const chat = activeChatRef.current;
+    if (!chat || loadingOlderRef.current || !hasMoreOlderRef.current) return;
+    loadingOlderRef.current = true;
+    setLoadingOlder(true);
+    const nextPage = messagesPageRef.current + 1;
+    try {
+      let data;
+      if (chat.type === 'dm') {
+        ({ data } = await chatApi.getMessages(chat.id, { PageNumber: nextPage, PageSize: MESSAGE_PAGE_SIZE }));
+      } else {
+        ({ data } = await groupApi.getGroupMessages(chat.id, { PageNumber: nextPage, PageSize: MESSAGE_PAGE_SIZE }));
+      }
+      const msgs = Array.isArray(data) ? data : data.items || data.data || data.messages || [];
+      if (msgs.length === 0) {
+        setHasMoreOlder(false);
+        return;
+      }
+      const older = [...msgs].reverse();
+      setMessages((prev) => [...older, ...prev]);
+      setMessagesPage(nextPage);
+      messagesPageRef.current = nextPage;
+      setHasMoreOlder(msgs.length >= MESSAGE_PAGE_SIZE);
+    } catch (err) {
+      console.error('Failed to load older messages:', err);
+    } finally {
+      loadingOlderRef.current = false;
+      setLoadingOlder(false);
+    }
+  }, []);
 
   // SignalR setup
   useEffect(() => {
@@ -236,6 +294,7 @@ export const ChatProvider = ({ children }) => {
     setReplyTo(null);
     setTypingUsers([]);
     loadMessages(chat);
+    if (!chat) return;
 
     const hub = hubRef.current || getHubConnection();
     if (!hub) return;
@@ -313,6 +372,9 @@ export const ChatProvider = ({ children }) => {
         replyTo, setReplyTo,
         typingUsers,
         loadConversations, loadGroups,
+        loadOlderMessages,
+        loadingOlder,
+        hasMoreOlder,
       }}>
         {children}
       </ChatContext.Provider>

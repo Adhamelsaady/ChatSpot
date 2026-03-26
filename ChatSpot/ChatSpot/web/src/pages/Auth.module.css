@@ -1,37 +1,30 @@
 .page {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--bg-base);
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
 .bg {
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
+  z-index: 0;
 }
 
-.orb1 {
+.bg::before {
+  content: '';
   position: absolute;
-  top: -15%;
-  right: -10%;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(124,106,240,0.15) 0%, transparent 70%);
-}
-
-.orb2 {
-  position: absolute;
-  bottom: -20%;
-  left: -10%;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(78,56,200,0.1) 0%, transparent 70%);
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 55% at 100% -10%, rgba(20, 184, 166, 0.11), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 0% 110%, rgba(15, 118, 110, 0.07), transparent 55%);
 }
 
 .card {
@@ -40,9 +33,9 @@
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  padding: 48px;
+  padding: clamp(28px, 5vw, 48px);
   width: 100%;
-  max-width: 420px;
+  max-width: min(420px, calc(100vw - 32px));
   animation: fadeIn 0.4s ease;
 }
 
@@ -53,9 +46,9 @@
   margin-bottom: 32px;
 }
 
-.logoIcon {
-  font-size: 24px;
+.logoMark {
   color: var(--accent-bright);
+  flex-shrink: 0;
 }
 
 .logoText {

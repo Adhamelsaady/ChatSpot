@@ -7,6 +7,12 @@
   animation: messageIn 0.2s ease;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    animation: none;
+  }
+}
+
 .mine {
   flex-direction: row-reverse;
 }
@@ -24,11 +30,22 @@
   margin-bottom: 2px;
 }
 
+.avatarSpacer {
+  width: 28px;
+  flex-shrink: 0;
+}
+
 .bubbleWrap {
   display: flex;
   flex-direction: column;
-  max-width: 65%;
+  max-width: min(65%, 520px);
   gap: 2px;
+}
+
+@media (max-width: 767px) {
+  .bubbleWrap {
+    max-width: min(88%, 100%);
+  }
 }
 
 .mine .bubbleWrap {
@@ -45,12 +62,13 @@
 
 .replyQuote {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 6px;
   background: var(--bg-elevated);
   border-radius: 8px 8px 0 0;
   padding: 6px 10px;
   max-width: 100%;
+  min-width: 0;
 }
 
 .replyBar {
@@ -63,21 +81,36 @@
 }
 
 .replyQuoteText {
+  flex: 1;
+  min-width: 0;
   font-size: 12px;
+  line-height: 1.45;
+  font-family: var(--font-body), system-ui, 'Segoe UI', Tahoma, sans-serif;
   color: var(--text-muted);
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-align: start;
+  unicode-bidi: plaintext;
 }
 
 .bubble {
   padding: 9px 13px;
   border-radius: 18px;
   display: flex;
+  flex-direction: row;
   align-items: flex-end;
-  gap: 8px;
-  word-break: break-word;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  justify-content: flex-start;
+  word-break: normal;
+  overflow-wrap: break-word;
   line-height: 1.45;
+  max-width: 100%;
 }
 
 .bubbleMine {
@@ -94,7 +127,11 @@
 
 .content {
   font-size: 14px;
-  line-height: 1.45;
+  line-height: 1.5;
+  text-align: start;
+  unicode-bidi: plaintext;
+  min-width: 0;
+  font-family: var(--font-body), system-ui, 'Segoe UI', Tahoma, sans-serif;
 }
 
 .time {
@@ -103,6 +140,7 @@
   white-space: nowrap;
   flex-shrink: 0;
   margin-bottom: -1px;
+  unicode-bidi: isolate;
 }
 
 .edited {
@@ -120,17 +158,36 @@
   padding: 6px 0;
 }
 
-/* Actions */
+/* Actions — hidden until row hover on fine pointers; always visible on touch */
 .actions {
   display: flex;
   gap: 2px;
   align-items: center;
   opacity: 0;
-  animation: fadeIn 0.1s ease forwards;
+  pointer-events: none;
+  transition: opacity var(--transition);
 }
 
 .row:hover .actions {
   opacity: 1;
+  pointer-events: auto;
+}
+
+.row:focus-within .actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (hover: none) {
+  .actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .actionBtn {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .actionsMine { flex-direction: row; }

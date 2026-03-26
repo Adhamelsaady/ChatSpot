@@ -5,15 +5,14 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 40px;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   color: var(--text-muted);
 }
 
-.icon {
-  font-size: 52px;
-  color: var(--accent-dim);
-  margin-bottom: 8px;
-  opacity: 0.6;
+.mark {
+  color: var(--accent);
+  margin-bottom: 4px;
+  opacity: 0.9;
 }
 
 .title {

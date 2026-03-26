@@ -44,6 +44,7 @@ export default function MessageInput() {
         <textarea
           ref={textareaRef}
           className={styles.textarea}
+          dir="auto"
           placeholder="Write a message… (Enter to send, Shift+Enter for newline)"
           value={text}
           onChange={handleInput}
