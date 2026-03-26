@@ -156,7 +156,7 @@ public class GroupService : IGroupService
     {
         var message = await _messageRepository.GetMessageByIdAsync(messageId);
         var groupId = Guid.Parse(message.GroupId);
-        if (message.SenderId != userId || !await _groupRepository.IsGroupAdmin(groupId, userId))
+        if (message.SenderId != userId && !await _groupRepository.IsGroupAdmin(groupId, userId))
         {
             return new BaseResponse()
             {
