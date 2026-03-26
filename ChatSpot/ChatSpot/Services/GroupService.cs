@@ -173,6 +173,17 @@ public class GroupService : IGroupService
         }
 
         await _messageRepository.DeleteMessageAsync(messageId);
+        var meta = await _groupMetaDataRepository.GetByGroupIdAsync(message.GroupId);
+        if (meta != null && meta.LastMessageId == messageId)
+        {
+            var latest = await _messageRepository.GetLatestNonDeletedForGroupAsync(message.GroupId);
+            if (latest == null || string.IsNullOrEmpty(latest.Id))
+                await _groupMetaDataRepository.ClearGroupLastMessageSnapshotAsync(message.GroupId);
+            else
+                await _groupMetaDataRepository.UpdateGroupLastMessageSnapshotAsync(message.GroupId, latest.Id,
+                    latest.Content, latest.Timestamp);
+        }
+
         await _hub.Clients.Group($"group:{groupId}").SendAsync("GroupMessageDeleted", message.GroupId, messageId);
         return  new BaseResponse() {IsSuccess = true, Message = "Deleted Successfully"};
     }

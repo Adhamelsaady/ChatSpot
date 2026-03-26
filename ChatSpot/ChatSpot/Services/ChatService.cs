@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography.X509Certificates;
 using AutoMapper;
 using ChatSpot.Contracts.Persistence;
 using ChatSpot.Contracts.Services;
@@ -138,6 +138,17 @@ public class ChatService : IChatService
         }
 
         await _messageRepository.DeleteMessageAsync(messageId);
+        var conversationSnap = await _conversationRepository.GetByIdAsync(message.ConversationId);
+        if (conversationSnap != null && conversationSnap.LastMessageId == messageId)
+        {
+            var latest = await _messageRepository.GetLatestNonDeletedForConversationAsync(message.ConversationId);
+            if (latest == null || string.IsNullOrEmpty(latest.Id))
+                await _conversationRepository.ClearLastMessageSnapshotAsync(message.ConversationId);
+            else
+                await _conversationRepository.UpdateLastMessageSnapshotAsync(message.ConversationId, latest.Id,
+                    latest.Content, latest.Timestamp);
+        }
+
         var receiverId = await GetReceiverIdAsync(message.ConversationId, userId);
         await _chatHub.Clients.User(userId).SendAsync("DirectMessageDeleted", message.ConversationId, messageId);
         await _chatHub.Clients.User(receiverId).SendAsync("DirectMessageDeleted", message.ConversationId, messageId);

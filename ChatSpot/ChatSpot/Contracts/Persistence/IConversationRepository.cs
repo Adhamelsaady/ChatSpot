@@ -1,4 +1,4 @@
-﻿using ChatSpot.Dtos.Responses;
+using ChatSpot.Dtos.Responses;
 using ChatSpot.Models.NoSQL;
 using ChatSpot.ResourceParameters;
 
@@ -15,4 +15,6 @@ public interface IConversationRepository
 
     Task<ConversationDocument> UpdateLastMessage(string conversationId , string messageId);
     Task MarkConversationAsRead(string conversationId, string userId);
+    Task UpdateLastMessageSnapshotAsync(string conversationId, string lastMessageId, string messageContent, DateTime lastUpdated);
+    Task ClearLastMessageSnapshotAsync(string conversationId);
 }

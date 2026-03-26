@@ -160,6 +160,7 @@ export const ChatProvider = ({ children }) => {
               prev.map(m => m.id === messageId ? { ...m, isDeleted: true, content: 'Message deleted' } : m)
           );
         }
+        loadConversations();
       });
 
       hub.on('GroupMessageDeleted', (groupId, messageId) => {
@@ -169,6 +170,7 @@ export const ChatProvider = ({ children }) => {
               prev.map(m => m.id === messageId ? { ...m, isDeleted: true, content: 'Message deleted' } : m)
           );
         }
+        loadGroups();
       });
 
       hub.on('UserTyping', (conversationId, userId) => {

@@ -1,4 +1,4 @@
-﻿using ChatSpot.Contracts.Persistence;
+using ChatSpot.Contracts.Persistence;
 using ChatSpot.Models.NoSQL;
 using MongoDB.Driver;
 
@@ -92,5 +92,24 @@ public class GroupMetaDataRepository : IGroupMetaDataRepository
         var update = Builders<GroupChatMetaDocument>.Update.Set(c => c.LastMessageId, messageId);
         await _db.GroupChatMeta.UpdateOneAsync(c => c.GroupId == groupId, update);
         return meta;
+    }
+
+    public async Task UpdateGroupLastMessageSnapshotAsync(string groupId, string lastMessageId, string lastMessage,
+        DateTime lastUpdated)
+    {
+        var update = Builders<GroupChatMetaDocument>.Update
+            .Set(c => c.LastMessageId, lastMessageId)
+            .Set(c => c.LastMessage, lastMessage)
+            .Set(c => c.LastUpdated, lastUpdated);
+        await _db.GroupChatMeta.UpdateOneAsync(c => c.GroupId == groupId, update);
+    }
+
+    public async Task ClearGroupLastMessageSnapshotAsync(string groupId)
+    {
+        var update = Builders<GroupChatMetaDocument>.Update
+            .Set(c => c.LastMessageId, string.Empty)
+            .Set(c => c.LastMessage, string.Empty)
+            .Set(c => c.LastUpdated, DateTime.UtcNow);
+        await _db.GroupChatMeta.UpdateOneAsync(c => c.GroupId == groupId, update);
     }
 }

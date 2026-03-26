@@ -1,4 +1,4 @@
-﻿using ChatSpot.Contracts.Persistence;
+using ChatSpot.Contracts.Persistence;
 using ChatSpot.Dtos.Responses;
 using ChatSpot.Models.NoSQL;
 using ChatSpot.ResourceParameters;
@@ -94,5 +94,22 @@ public class ConversationRepository : IConversationRepository
         await  _db.Conversations.UpdateOneAsync(c => c.Id == conversation.Id, update);
     }
 
-    
+    public async Task UpdateLastMessageSnapshotAsync(string conversationId, string lastMessageId, string messageContent,
+        DateTime lastUpdated)
+    {
+        var update = Builders<ConversationDocument>.Update
+            .Set(c => c.LastMessageId, lastMessageId)
+            .Set(c => c.LastMessage, messageContent)
+            .Set(c => c.LastUpdated, lastUpdated);
+        await _db.Conversations.UpdateOneAsync(c => c.Id == conversationId, update);
+    }
+
+    public async Task ClearLastMessageSnapshotAsync(string conversationId)
+    {
+        var update = Builders<ConversationDocument>.Update
+            .Set(c => c.LastMessageId, string.Empty)
+            .Set(c => c.LastMessage, string.Empty)
+            .Set(c => c.LastUpdated, DateTime.UtcNow);
+        await _db.Conversations.UpdateOneAsync(c => c.Id == conversationId, update);
+    }
 }

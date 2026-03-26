@@ -1,4 +1,4 @@
-﻿using ChatSpot.Contracts.Persistence;
+using ChatSpot.Contracts.Persistence;
 using ChatSpot.Dtos.Responses;
 using ChatSpot.Models.NoSQL;
 using ChatSpot.ResourceParameters;
@@ -71,5 +71,25 @@ public class MessageRepository : IMessageRepository
             .Set(m => m.IsDeleted, true);
         var result = await _db.Messages.UpdateOneAsync(filter, update);
         return result.ModifiedCount > 0;
+    }
+
+    public async Task<MessageDocument?> GetLatestNonDeletedForConversationAsync(string conversationId)
+    {
+        var filter = Builders<MessageDocument>.Filter.Eq(m => m.ConversationId, conversationId)
+                     & Builders<MessageDocument>.Filter.Eq(m => m.IsDeleted, false);
+        return await _db.Messages.Find(filter)
+            .SortByDescending(m => m.Timestamp)
+            .Limit(1)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<MessageDocument?> GetLatestNonDeletedForGroupAsync(string groupId)
+    {
+        var filter = Builders<MessageDocument>.Filter.Eq(m => m.GroupId, groupId)
+                     & Builders<MessageDocument>.Filter.Eq(m => m.IsDeleted, false);
+        return await _db.Messages.Find(filter)
+            .SortByDescending(m => m.Timestamp)
+            .Limit(1)
+            .FirstOrDefaultAsync();
     }
 }
