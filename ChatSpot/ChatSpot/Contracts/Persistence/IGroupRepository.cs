@@ -1,4 +1,4 @@
-﻿using ChatSpot.Dtos.Responses;
+using ChatSpot.Dtos.Responses;
 using ChatSpot.Models.SQL;
 using ChatSpot.ResourceParameters;
 
@@ -10,6 +10,10 @@ public interface IGroupRepository
     Task<Group?> GetByIdAsync(Guid id);
     Task<Group?> GetByIdWithMembersAsync(Guid id);
     Task<PagedResult<Group>> GetUserGroupsAsync(BaseResourceParameter baseResourceParameter , string userId);
+
+    /// <summary>All groups the user belongs to (matching search), for ordering by activity before paging.</summary>
+    Task<(List<Group> Groups, int TotalCount)> GetUserGroupsMatchingAsync(
+        BaseResourceParameter baseResourceParameter, string userId);
     Task<Group> CreateAsync(Group group);
     Task UpdateAsync(Group group);
     Task SetUserRole(Guid groupId, string userId, GroupRole role);

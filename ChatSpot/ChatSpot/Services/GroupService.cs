@@ -77,15 +77,34 @@ public class GroupService : IGroupService
 
     public async Task<PagedResult<GroupToReturnDto>> GetMyGroups(BaseResourceParameter baseResourceParameter, string currentUserId)
     {
-        var pagedGroups = await _groupRepository.GetUserGroupsAsync(baseResourceParameter, currentUserId);
-        
-        var groupIds = pagedGroups.Items.Select(g => g.GroupId.ToString()).ToList();
-        
+        var (allGroups, totalCount) =
+            await _groupRepository.GetUserGroupsMatchingAsync(baseResourceParameter, currentUserId);
+        if (allGroups.Count == 0)
+        {
+            return new PagedResult<GroupToReturnDto>
+            {
+                Items = new List<GroupToReturnDto>(),
+                TotalCount = 0,
+                PageNumber = baseResourceParameter.PageNumber,
+                PageSize = baseResourceParameter.PageSize
+            };
+        }
+
+        var groupIds = allGroups.Select(g => g.GroupId.ToString()).ToList();
         var allMeta = await _groupMetaDataRepository.GetByGroupIdsAsync(groupIds);
-        
         var metaDict = allMeta.ToDictionary(m => m.GroupId);
-        
-        var groupsToReturn = pagedGroups.Items.Select(group =>
+
+        var ordered = allGroups
+            .OrderByDescending(g =>
+                metaDict.GetValueOrDefault(g.GroupId.ToString())?.LastUpdated ?? g.CreatedAt)
+            .ToList();
+
+        var pageItems = ordered
+            .Skip((baseResourceParameter.PageNumber - 1) * baseResourceParameter.PageSize)
+            .Take(baseResourceParameter.PageSize)
+            .ToList();
+
+        var groupsToReturn = pageItems.Select(group =>
         {
             var dto = _mapper.Map<GroupToReturnDto>(group);
             var groupIdStr = group.GroupId.ToString();
@@ -95,16 +114,17 @@ public class GroupService : IGroupService
                 dto.LastUpdateTime = meta.LastUpdated;
                 dto.UnreadCount = meta.UnreadCount?.GetValueOrDefault(currentUserId) ?? 0;
             }
+
             return dto;
         }).ToList();
+
         return new PagedResult<GroupToReturnDto>
         {
             Items = groupsToReturn,
-            TotalCount = pagedGroups.TotalCount,
-            PageNumber = pagedGroups.PageNumber,
-            PageSize = pagedGroups.PageSize
+            TotalCount = totalCount,
+            PageNumber = baseResourceParameter.PageNumber,
+            PageSize = baseResourceParameter.PageSize
         };
-        
     }
     
     public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending , string currentUserId , Guid groupId)
