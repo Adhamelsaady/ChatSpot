@@ -4,7 +4,8 @@ public class MessageToReturnDto : BaseResponse
 {
     public string? Id { get; set; }
 
-    public string SenderId { get; set; } = string.Empty;        
+    public string SenderId { get; set; } = string.Empty;       
+    
     public string SenderName { get; set; } = string.Empty;
     public string? ReceiverId { get; set; }                     
 

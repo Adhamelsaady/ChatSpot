@@ -47,7 +47,8 @@ public class ChatController : ControllerBase
             return  BadRequest();
         }
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-        var result =await _chatService.SendMessageAsync(messageForSending , currentUserId , conversationId);
+        var cuurentUserName = User.FindFirst(ClaimTypes.Name)?.Value;
+        var result= await _chatService.SendMessageAsync(messageForSending , currentUserId , cuurentUserName , conversationId);
         if(result.IsSuccess) return Ok(result);
         else return  BadRequest(result);
     }
