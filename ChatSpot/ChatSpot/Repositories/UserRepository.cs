@@ -23,7 +23,8 @@ public class UserRepository : IUserRepository
     {
         var normalized = resourceParameter.SearchQuery!.Trim().ToUpperInvariant();
 
-        var ranked = _userManager.Users.Where(u => u.Id != excludedUser && u.EmailConfirmed  && u.NormalizedUserName!.Contains(normalized))
+        var ranked = _userManager.Users.Where(u => u.Id != excludedUser && u.EmailConfirmed  
+                                                                        && u.NormalizedUserName!.Contains(normalized))
             .Select(u => new
             {
                 User = u,
