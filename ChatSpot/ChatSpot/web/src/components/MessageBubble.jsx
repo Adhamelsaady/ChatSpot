@@ -1,12 +1,13 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { enUS } from 'date-fns/locale/en-US';
 import Avatar from './Avatar';
 import styles from './MessageBubble.module.css';
 
 export default function MessageBubble({ message, isMine, showAvatar, onDelete, onReply }) {
 
   const time = message.timestamp
-    ? format(new Date(message.timestamp), 'HH:mm')
+    ? format(new Date(message.timestamp), 'h:mm a', { locale: enUS })
     : '';
 
   if (message.isDeleted) {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Backend is ASP.NET — not Node. In dev, leave VITE_API_URL unset so requests go to the Vite origin
-// and vite.config.js proxies /api → Kestrel. Set VITE_API_URL for production or a direct API host.
+// Backend is ASP.NET. Leave VITE_API_URL unset in dev to use Vite proxy → localhost (see vite.config.js).
+// Set VITE_API_URL in .env.local or the Vercel build to point at your deployed API (no trailing slash).
 const envBase = import.meta.env.VITE_API_URL;
 const BASE_URL = typeof envBase === 'string' ? envBase.replace(/\/+$/, '') : '';
 
@@ -62,7 +62,10 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         localStorage.clear();
-        window.location.href = '/login';
+        window.location.href = new URL(
+          'login',
+          new URL(import.meta.env.BASE_URL || '/', window.location.origin)
+        ).href;
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

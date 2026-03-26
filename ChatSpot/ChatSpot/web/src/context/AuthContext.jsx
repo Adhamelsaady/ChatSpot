@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.clear();
     sessionStorage.clear();
     setUser(null);
-    window.location.href = '/login'; // force full page reload to clear all state
+    window.location.href = new URL(import.meta.env.BASE_URL || '/', window.location.origin).href;
   }, []);
 
   return (

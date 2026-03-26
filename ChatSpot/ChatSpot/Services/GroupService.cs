@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using ChatSpot.Contracts.Persistence;
 using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos;

@@ -1,10 +1,17 @@
 import * as signalR from '@microsoft/signalr';
 
-// Dev: same origin so Vite proxies /chatHub → ASP.NET. Prod: set VITE_SIGNALR_URL or use default host.
+function trimBase(v) {
+  return typeof v === 'string' ? v.replace(/\/+$/, '') : '';
+}
+
+// Same rules as client.js: unset in dev → '/chatHub' via Vite proxy to local ASP.NET.
+// Set VITE_API_URL (and optionally VITE_SIGNALR_URL) to use a hosted API from dev or prod.
 const hubBase =
-  import.meta.env.VITE_SIGNALR_URL ||
-  (import.meta.env.DEV ? '' : 'https://chatspot-production-640b.up.railway.app');
-const hubUrl = hubBase ? `${hubBase.replace(/\/+$/, '')}/chatHub` : '/chatHub';
+  trimBase(import.meta.env.VITE_SIGNALR_URL) ||
+  trimBase(import.meta.env.VITE_API_URL) ||
+  '';
+
+const hubUrl = hubBase ? `${hubBase}/chatHub` : '/chatHub';
 
 let connection = null;
 
