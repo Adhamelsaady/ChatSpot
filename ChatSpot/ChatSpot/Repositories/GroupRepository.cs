@@ -1,4 +1,4 @@
-﻿using ChatSpot.Contracts.Persistence;
+using ChatSpot.Contracts.Persistence;
 using ChatSpot.Dtos.Responses;
 using ChatSpot.Models.SQL;
 using ChatSpot.ResourceParameters;
@@ -56,6 +56,25 @@ public class GroupRepository : IGroupRepository
             PageNumber = baseResourceParameter.PageNumber,
             PageSize = baseResourceParameter.PageSize
         };
+    }
+
+    public async Task<(List<Group> Groups, int TotalCount)> GetUserGroupsMatchingAsync(
+        BaseResourceParameter baseResourceParameter, string userId)
+    {
+        var collection = _db.Groups
+            .Include(g => g.Members)
+            .Where(g => g.Members.Any(p => p.UserId == userId))
+            .AsQueryable();
+        if (!string.IsNullOrWhiteSpace(baseResourceParameter.SearchQuery))
+        {
+            var search = baseResourceParameter.SearchQuery.Trim().ToLower();
+            collection = collection.Where(g => g.Name.ToLower().Contains(search)
+                                               || (g.Description != null && g.Description.ToLower().Contains(search)));
+        }
+
+        var totalCount = await collection.CountAsync();
+        var groups = await collection.ToListAsync();
+        return (groups, totalCount);
     }
 
     public async Task<Group> CreateAsync(Group group)

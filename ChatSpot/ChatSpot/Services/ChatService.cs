@@ -51,6 +51,7 @@ public class ChatService : IChatService
                 Id = conversation.Id,
                 User = _mapper.Map<UserDto>(user),
                 LastMessage = conversation.LastMessage,
+                LastMessageDate = conversation.LastUpdated,
                 UnreadMessagesCount = unreadCount,
             });
         }

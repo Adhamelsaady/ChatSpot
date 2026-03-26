@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
 import { formatDistanceToNow } from 'date-fns';
@@ -12,13 +12,29 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
   const [tab, setTab] = useState('dms');
   const [search, setSearch] = useState('');
 
-  const filtered = tab === 'dms'
-      ? conversations.filter(c => {
-        const name = c.user?.userName || c.user?.email || '';
-        return name.toLowerCase().includes(search.toLowerCase()) ||
-            c.lastMessage?.toLowerCase().includes(search.toLowerCase());
-      })
-      : groups.filter(g => g.name?.toLowerCase().includes(search.toLowerCase()));
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    if (tab === 'dms') {
+      return conversations
+          .filter((c) => {
+            const name = c.user?.userName || c.user?.email || '';
+            return name.toLowerCase().includes(q) ||
+                c.lastMessage?.toLowerCase().includes(q);
+          })
+          .sort((a, b) => {
+            const ta = a.lastMessageDate ? new Date(a.lastMessageDate).getTime() : 0;
+            const tb = b.lastMessageDate ? new Date(b.lastMessageDate).getTime() : 0;
+            return tb - ta;
+          });
+    }
+    return groups
+        .filter((g) => g.name?.toLowerCase().includes(q))
+        .sort((a, b) => {
+          const ta = new Date(a.lastUpdateTime || a.createdAt || 0).getTime();
+          const tb = new Date(b.lastUpdateTime || b.createdAt || 0).getTime();
+          return tb - ta;
+        });
+  }, [tab, conversations, groups, search]);
 
   return (
       <aside className={styles.sidebar}>
@@ -112,7 +128,7 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
 
           {tab === 'groups' && filtered.map((group) => {
             const isActive = activeChat?.id === group.groupId;
-            const unread = group.unreadMessagesCount || 0;
+            const unread = group.unreadCount ?? group.unreadMessagesCount ?? 0;
             return (
                 <button
                     key={group.groupId}
@@ -123,9 +139,9 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
                   <div className={styles.itemContent}>
                     <div className={styles.itemTop}>
                       <span className={styles.itemName}>{group.name}</span>
-                      {group.lastMessageDate && (
+                      {(group.lastUpdateTime || group.createdAt) && (
                           <span className={styles.itemTime}>
-                      {formatDistanceToNow(new Date(group.lastMessageDate), { addSuffix: false })}
+                      {formatDistanceToNow(new Date(group.lastUpdateTime || group.createdAt), { addSuffix: false })}
                     </span>
                       )}
                     </div>
