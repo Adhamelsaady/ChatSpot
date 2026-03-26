@@ -207,8 +207,7 @@ public class GroupService : IGroupService
         await _hub.Clients.Group($"group:{groupId}").SendAsync("MemberRemoved", groupId, targetUserId);
         return new BaseResponse() {IsSuccess = true, Message = "Removed Successfully"};
     }
-
-
+    
     public async Task<BaseResponse> LeaveGroupAsync(Guid groupId, string userId)
     {
         var member = await _groupRepository.GetMemberAsync(groupId, userId);

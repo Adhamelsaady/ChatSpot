@@ -62,10 +62,10 @@ public class ChatService : IChatService
     }
 
     public async Task<MessageToReturnDto> SendMessageAsync(MessageForSending messageForSending, string currentUser,
+        string userCurrentName, 
         string conversationId)
     {
         var messageDocument = _mapper.Map<MessageDocument>(messageForSending);
-        messageDocument.SenderName = (await _userRepository.GetByIdAsync(currentUser)).UserName;
         string? replyPreview = null;
         if (!string.IsNullOrEmpty(messageForSending.ReplyToId))
         {
@@ -75,6 +75,7 @@ public class ChatService : IChatService
         }
 
         messageDocument.ReceiverId = await GetReceiverIdAsync(conversationId, currentUser);
+        messageDocument.SenderName = currentUser;
         messageDocument.ReplyToPreview = replyPreview;
         messageDocument.SenderId = currentUser;
         messageDocument.Timestamp = DateTime.UtcNow;
