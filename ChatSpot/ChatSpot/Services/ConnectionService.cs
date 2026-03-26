@@ -57,7 +57,7 @@ public class ConnectionService : IConnectionService
 
         connection.IsConnected = false;
         connection.DisconnectedAt = DateTime.UtcNow;
-        _db.UserConnections.Update(connection);
+        _db.UserConnections.Update(connection); 
         var user = await _userRepository.GetByIdAsync(connection.UserId);
         if (user != null)
         {
