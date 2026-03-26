@@ -20,7 +20,7 @@ public interface IGroupService
 
     Task<BaseResponse> RemoveMemberAsync(Guid groupId, string removerId, string targetUserId);
     Task<BaseResponse> DeleteMessageAsync(string messageId, string userId);
-    Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUserId, Guid groupId);
+    Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending, string currentUserId , string userName, Guid groupId);
 
     Task<BaseResponse> LeaveGroupAsync(Guid groupId, string userId);
     Task<BaseResponse> ToggleMemberAdminRoleAsync(Guid groupId, string targetUserId, string requesterId);

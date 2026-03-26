@@ -41,7 +41,8 @@ public class GroupController : ControllerBase
     public async Task<IActionResult> SendMessage([FromBody] MessageForSending messageForSending , [FromRoute] Guid groupId)
     {
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var result = await _groupService.SendMessage(messageForSending, currentUserId , groupId);
+        var currentUserName = User.FindFirst(ClaimTypes.Name)?.Value;
+        var result = await _groupService.SendMessage(messageForSending, currentUserId , currentUserName , groupId);
         return Ok(result);
     }
     

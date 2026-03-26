@@ -107,7 +107,7 @@ public class GroupService : IGroupService
         
     }
     
-    public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending , string currentUserId , Guid groupId)
+    public async Task<MessageToReturnDto> SendMessage(MessageForSending messageForSending , string currentUserId , string userName , Guid groupId)
     {
         var messageDocument = _mapper.Map<MessageDocument>(messageForSending);
         
@@ -118,10 +118,12 @@ public class GroupService : IGroupService
             if (messageToReply.IsDeleted) replyPreview = "Deleted Message";
             else replyPreview = messageToReply.Content[..Math.Min(60, messageToReply.Content.Length)];
         }
+        messageDocument.SenderName = userName;
         messageDocument.GroupId = groupId.ToString();
         messageDocument.ReplyToPreview = replyPreview;
         messageDocument.SenderId = currentUserId;
         messageDocument.Timestamp = DateTime.UtcNow;
+ 
         var group = await _groupRepository.GetByIdWithMembersAsync(groupId);
         await _groupMetaDataRepository.UpsertAsync(groupId.ToString() ,  messageDocument.Content , currentUserId);
         var usersToUpdate = group.Members
