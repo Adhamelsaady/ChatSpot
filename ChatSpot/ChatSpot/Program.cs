@@ -31,6 +31,7 @@ builder.Services.AddDbContext<ChatSpotDbContext>(opts =>
 builder.Services.ConfigureServices();
 builder.Services.ConfigurePersistence();
 builder.Services.ConfigureAuthentication(builder.Configuration);
+builder.Services.ConfigureCloudinary(builder.Configuration);
 builder.Services.AddSignalR();
 
 
