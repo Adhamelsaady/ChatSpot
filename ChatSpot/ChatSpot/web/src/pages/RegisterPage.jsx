@@ -5,7 +5,7 @@ import BrandMark from '../components/BrandMark';
 import styles from './Auth.module.css';
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '', userName: '', bio: '' });
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', userName: '', bio: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -38,6 +38,28 @@ export default function RegisterPage() {
         <p className={styles.subtitle}>Join ChatSpot and start connecting</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.fieldRow}>
+            <div className={styles.field}>
+              <label className={styles.label}>First Name</label>
+              <input
+                className={styles.input}
+                placeholder="John"
+                value={form.firstName}
+                onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                required
+              />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Last Name</label>
+              <input
+                className={styles.input}
+                placeholder="Doe"
+                value={form.lastName}
+                onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                required
+              />
+            </div>
+          </div>
           <div className={styles.field}>
             <label className={styles.label}>Username</label>
             <input

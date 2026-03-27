@@ -15,6 +15,8 @@ public class RegisterDto
     [Required(ErrorMessage = "Full name is required")]
     [MinLength(2, ErrorMessage = "Full name must be at least 3 characters")]
     public string UserName { get; set; } = string.Empty;
-    
+
+    public string FirstName { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
     public string Bio { get; set; } = string.Empty;
 }

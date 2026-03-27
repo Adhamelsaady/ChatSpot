@@ -6,7 +6,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   // Used only when VITE_API_URL is unset: browser hits same origin and Vite proxies /api + /chatHub here.
   // Default HTTP Kestrel URL so Node does not need to trust the ASP.NET dev HTTPS cert.
-  const raw = env.VITE_DEV_PROXY_TARGET || 'http://localhost:5215'
+  const raw = env.VITE_DEV_PROXY_TARGET || 'http://localhost:5215/api'
   const proxyTarget = raw.replace(/\/+$/, '')
 
   return {

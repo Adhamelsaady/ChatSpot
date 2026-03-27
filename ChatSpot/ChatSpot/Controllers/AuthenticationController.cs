@@ -13,12 +13,11 @@ namespace ChatSpot.Controllers;
 public class AuthenticationController : ControllerBase
 {
     private readonly IAuthenticationService _authenticationService;
-    private readonly TokenValidationParameters _tokenValidationParameters;
+
 
     public AuthenticationController(IAuthenticationService authenticationService , TokenValidationParameters tokenValidationParameters)
     {
         _authenticationService = authenticationService;
-        _tokenValidationParameters = tokenValidationParameters;
     }
 
     [HttpPost("register")]

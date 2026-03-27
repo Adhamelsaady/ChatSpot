@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('accessToken');
     if (token) {
       const payload = decodeJwt(token);
+      console.log(payload.exp * 1000, Date.now(), payload.exp * 1000 > Date.now())
       if (payload && payload.exp * 1000 > Date.now()) {
         return {
           id: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],

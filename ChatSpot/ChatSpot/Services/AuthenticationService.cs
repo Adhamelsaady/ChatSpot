@@ -6,7 +6,6 @@ using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Dtos.Outgoing;
-using ChatSpot.Models.NoSQL;
 using ChatSpot.Models.SQL;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
