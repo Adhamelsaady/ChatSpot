@@ -156,13 +156,13 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<AuthResult> Login(LoginDto loginDto)
     {
-        var user = await _userManager.FindByEmailAsync(loginDto.Email);
+        var user = await _userManager.FindByNameAsync(loginDto.UserName);
         if (user == null || !user.EmailConfirmed)
         {
             return new AuthResult()
             {
                 IsSuccess = false,
-                Message = "Wrong email or password"
+                Message = "Wrong User Name or password"
             };
         }
 
@@ -172,7 +172,7 @@ public class AuthenticationService : IAuthenticationService
             return new AuthResult()
             {
                 IsSuccess = false,
-                Message = "Wrong email or password"
+                Message = "Wrong User Name or password"
             };
         }
 
