@@ -17,7 +17,11 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
     if (tab === 'dms') {
       return conversations
           .filter((c) => {
-            const name = c.user?.userName || c.user?.email || '';
+            const u = c.user;
+            const first = u?.firstName?.trim();
+            const last  = u?.lastName?.trim();
+            const full  = [first, last].filter(Boolean).join(' ');
+            const name  = full || u?.userName || u?.email || '';
             return name.toLowerCase().includes(q) ||
                 c.lastMessage?.toLowerCase().includes(q);
           })
@@ -97,7 +101,11 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
           )}
 
           {tab === 'dms' && filtered.map((conv) => {
-            const otherName = conv.user?.userName || conv.user?.email || 'Unknown';
+            const u = conv.user;
+            const first = u?.firstName?.trim();
+            const last  = u?.lastName?.trim();
+            const full  = [first, last].filter(Boolean).join(' ');
+            const otherName = full || u?.userName || u?.email || 'Unknown';
             const isOnline = conv.user?.status === 'Online';
             const isActive = activeChat?.id === conv.id;
             const unread = conv.unreadMessagesCount || 0;

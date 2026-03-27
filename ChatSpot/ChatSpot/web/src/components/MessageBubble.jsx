@@ -10,6 +10,11 @@ export default function MessageBubble({ message, isMine, showAvatar, onDelete, o
     ? format(new Date(message.timestamp), 'h:mm a', { locale: enUS })
     : '';
 
+  const first = message.senderFirstName?.trim();
+  const last  = message.senderLastName?.trim();
+  const full  = [first, last].filter(Boolean).join(' ');
+  const displayName = full || message.senderName || message.senderId;
+
   if (message.isDeleted) {
     return (
       <div className={`${styles.row} ${isMine ? styles.mine : styles.theirs}`}>
@@ -28,7 +33,7 @@ export default function MessageBubble({ message, isMine, showAvatar, onDelete, o
       {!isMine && (
         <div className={styles.avatarSlot}>
           {showAvatar ? (
-            <Avatar name={message.senderName || message.senderId} size={28} />
+            <Avatar name={displayName} size={28} />
           ) : (
             <div className={styles.avatarSpacer} />
           )}
@@ -37,7 +42,7 @@ export default function MessageBubble({ message, isMine, showAvatar, onDelete, o
 
       <div className={styles.bubbleWrap}>
         {!isMine && showAvatar && (
-          <span className={styles.senderName}>{message.senderName || message.senderId}</span>
+          <span className={styles.senderName}>{displayName}</span>
         )}
 
         {/* Reply preview */}

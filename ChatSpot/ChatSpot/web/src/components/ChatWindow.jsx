@@ -142,10 +142,16 @@ export default function ChatWindow({ showBack, onBack }) {
     }
   }, [loadingMessages, messages.length]);
 
+  const dmUser = activeChat?.data?.user;
   const chatName =
     activeChat?.type === 'group'
       ? activeChat.data?.name
-      : activeChat?.data?.user?.userName || 'Unknown';
+      : (() => {
+          const first = dmUser?.firstName?.trim();
+          const last  = dmUser?.lastName?.trim();
+          const full  = [first, last].filter(Boolean).join(' ');
+          return full || dmUser?.userName || 'Unknown';
+        })();
 
   const isOnline = activeChat?.data?.user?.status === 'Online';
   const lastSeen = activeChat?.data?.user?.lastSeen;
