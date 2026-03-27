@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
           id: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
           email: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
           username: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+          profilePicture: localStorage.getItem('profilePicture') || '',
           token,
         };
       }
@@ -40,11 +41,13 @@ export const AuthProvider = ({ children }) => {
     });
     localStorage.setItem('accessToken', data.token);
     localStorage.setItem('refreshToken', data.refreshToken);
+    if (data.profilePicture) localStorage.setItem('profilePicture', data.profilePicture);
     const payload = decodeJwt(data.token);
     const userData = {
       id: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
       email: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
       username: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+      profilePicture: data.profilePicture || '',
       token: data.token,
     };
     setUser(userData);

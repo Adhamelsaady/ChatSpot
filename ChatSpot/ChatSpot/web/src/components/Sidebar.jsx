@@ -164,7 +164,7 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
         </div>
 
         <div className={styles.userBar}>
-          <Avatar name={user?.username} size={34} online={true} />
+          <Avatar name={user?.username} src={user?.profilePicture} size={34} online={true} />
           <div className={styles.userInfo}>
             <span className={styles.userName}>{user?.username}</span>
             <span className={styles.userStatus}>Online</span>

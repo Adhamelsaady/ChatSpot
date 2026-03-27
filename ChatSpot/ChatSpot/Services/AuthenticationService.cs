@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using ChatSpot.Contracts.Infrastructure;
 using ChatSpot.Contracts.Persistence;
@@ -179,6 +179,7 @@ public class AuthenticationService : IAuthenticationService
         var authResult = await _jwtTokenGeneration.GenerateJwtToken(user);
         authResult.IsSuccess = true;
         authResult.Message = "Login successful";
+        authResult.ProfilePicture = user.ProfilePicture ?? string.Empty;
         return authResult;
     }
 
