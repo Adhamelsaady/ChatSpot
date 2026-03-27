@@ -10,7 +10,8 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<RegisterDto , ApplicationUser>();
+        CreateMap<RegisterDto , ApplicationUser>()
+            .ForMember(dest => dest.ProfilePicture , opt => opt.Ignore());
         CreateMap<MessageForSending , MessageDocument>();
         CreateMap<MessageDocument, MessageToReturnDto>();
         CreateMap<ApplicationUser , UserDto>()

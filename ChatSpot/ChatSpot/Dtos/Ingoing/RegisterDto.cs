@@ -16,6 +16,8 @@ public class RegisterDto
     [MinLength(2, ErrorMessage = "Full name must be at least 3 characters")]
     public string UserName { get; set; } = string.Empty;
 
+    public IFormFile ProfilePicture { get; set; }
+    
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string Bio { get; set; } = string.Empty;

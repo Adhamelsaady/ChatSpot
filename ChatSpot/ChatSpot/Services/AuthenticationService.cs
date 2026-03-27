@@ -7,6 +7,8 @@ using ChatSpot.Dtos;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Dtos.Outgoing;
 using ChatSpot.Models.SQL;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
@@ -22,6 +24,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly IJwtTokenGeneration _jwtTokenGeneration;
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly Cloudinary _cloudinary;
 
     public AuthenticationService(
         UserManager<ApplicationUser> userManager,
@@ -31,7 +34,8 @@ public class AuthenticationService : IAuthenticationService
         IEmailService emailService,
         IJwtTokenGeneration jwtTokenGeneration,
         TokenValidationParameters tokenValidationParameters,
-        IRefreshTokenRepository refreshTokenRepository)
+        IRefreshTokenRepository refreshTokenRepository, 
+        Cloudinary cloudinary)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -41,6 +45,7 @@ public class AuthenticationService : IAuthenticationService
         _jwtTokenGeneration = jwtTokenGeneration;
         _tokenValidationParameters = tokenValidationParameters;
         _refreshTokenRepository = refreshTokenRepository;
+        _cloudinary = cloudinary;
     }
 
     public async Task<BaseResponse> Register(RegisterDto registerDto)
@@ -65,6 +70,31 @@ public class AuthenticationService : IAuthenticationService
         var userToAdd = _mapper.Map<ApplicationUser>(registerDto);
         userToAdd.Otp = _otpService.GenerateOtp();
         userToAdd.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+
+        if (registerDto.ProfilePicture != null)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(registerDto.ProfilePicture.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(ext))
+                return new BaseResponse { IsSuccess = false, Message = "Only image files are allowed." };
+            if (registerDto.ProfilePicture.Length > 5 * 1024 * 1024)
+                return new BaseResponse { IsSuccess = false, Message = "Profile picture must be under 5MB." };
+            using var stream = registerDto.ProfilePicture.OpenReadStream();
+            var uploadParams = new ImageUploadParams
+            {
+                File = new FileDescription(registerDto.ProfilePicture.FileName, stream),
+                Folder = "chatspot/profile-pictures",
+                Transformation = new Transformation().Width(300).Height(300).Crop("fill").Gravity("face")
+            };
+            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+            if (uploadResult.Error != null)
+                return new BaseResponse { IsSuccess = false, Message = "Failed to upload profile picture." };
+
+            userToAdd.ProfilePicture = uploadResult.SecureUrl.ToString();
+        }
+        
         var result = await _userManager.CreateAsync(userToAdd, registerDto.Password);
         if (result.Succeeded == false)
         {
