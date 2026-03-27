@@ -84,18 +84,25 @@ export default function NewChatModal({ onClose }) {
           {!loading && !query && (
             <div className={styles.empty}>Type a name to search for users</div>
           )}
-          {results.map((u) => (
-            <button key={u.id} className={styles.userItem} onClick={() => startChat(u)}>
-              <Avatar name={u.userName || u.username} />
-              <div className={styles.userInfo}>
-                <span className={styles.userName}>{u.userName || u.username}</span>
-                <span className={styles.userEmail}>{u.email}</span>
-              </div>
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{color:'var(--text-muted)'}}>
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-            </button>
-          ))}
+          {results.map((u) => {
+            const userName = u.userName || u.username || '?';
+            const first = u.firstName?.trim();
+            const last  = u.lastName?.trim();
+            const fullName = [first, last].filter(Boolean).join(' ');
+            const subtitle = fullName || u.email || '';
+            return (
+              <button key={u.id} className={styles.userItem} onClick={() => startChat(u)}>
+                <Avatar name={userName} />
+                <div className={styles.userInfo}>
+                  <span className={styles.userName}>{userName}</span>
+                  {subtitle && <span className={styles.userEmail}>{subtitle}</span>}
+                </div>
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{color:'var(--text-muted)'}}>
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

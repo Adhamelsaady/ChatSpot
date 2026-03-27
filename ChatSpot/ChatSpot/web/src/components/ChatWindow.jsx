@@ -150,7 +150,7 @@ export default function ChatWindow({ showBack, onBack }) {
           const first = dmUser?.firstName?.trim();
           const last  = dmUser?.lastName?.trim();
           const full  = [first, last].filter(Boolean).join(' ');
-          return full || dmUser?.userName || 'Unknown';
+          return full || dmUser?.userName || dmUser?.username || 'Chat';
         })();
 
   const isOnline = activeChat?.data?.user?.status === 'Online';
