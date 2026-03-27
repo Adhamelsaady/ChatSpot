@@ -16,13 +16,13 @@ function loginErrorMessage(err) {
   if (!err.response && (err.code === 'ERR_NETWORK' || err.message === 'Network Error')) {
     return 'Cannot reach the API. Start the ASP.NET project (Vite proxies to http://localhost:5215).';
   }
-  return 'Invalid email or password';
+  return 'Invalid username or password';
 }
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ userName: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +31,7 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(form.email, form.password);
+      await login(form.userName, form.password);
       navigate('/');
     } catch (err) {
       setError(loginErrorMessage(err));
@@ -53,13 +53,13 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.field}>
-            <label className={styles.label}>Email</label>
+            <label className={styles.label}>Username</label>
             <input
-              type="email"
+              type="text"
               className={styles.input}
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="johndoe"
+              value={form.userName}
+              onChange={(e) => setForm({ ...form, userName: e.target.value })}
               required
             />
           </div>
