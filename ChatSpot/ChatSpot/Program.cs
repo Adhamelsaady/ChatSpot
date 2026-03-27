@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 var reactOrigins = new[]
 {
     "http://localhost:4000",
+    "http://localhost:5125",
     "http://localhost:5173",
     "https://chatspot-liart.vercel.app",
 };
@@ -35,7 +36,10 @@ builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.MapOpenApi();
 app.UseSwagger();
 app.UseSwaggerUI();

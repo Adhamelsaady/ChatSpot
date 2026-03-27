@@ -12,7 +12,7 @@ public class UserRepository : IUserRepository
     private readonly ChatSpotDbContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
 
-    public UserRepository(ChatSpotDbContext db , UserManager<ApplicationUser> userManager)
+    public UserRepository(ChatSpotDbContext db, UserManager<ApplicationUser> userManager)
     {
         _db = db;
         _userManager = userManager;
@@ -22,8 +22,7 @@ public class UserRepository : IUserRepository
         string excludedUser)
     {
         var normalized = resourceParameter.SearchQuery!.Trim().ToUpperInvariant();
-
-        var ranked = _userManager.Users.Where(u => u.Id != excludedUser && u.EmailConfirmed  
+        var ranked = _userManager.Users.Where(u => u.Id != excludedUser && u.EmailConfirmed
                                                                         && u.NormalizedUserName!.Contains(normalized))
             .Select(u => new
             {
@@ -34,6 +33,7 @@ public class UserRepository : IUserRepository
             })
             .OrderBy(x => x.Rank)
             .ThenBy(x => x.User.NormalizedUserName);
+
         var totalCount = await ranked.CountAsync();
         var items = await ranked
             .Skip((resourceParameter.PageNumber - 1) * resourceParameter.PageSize)
