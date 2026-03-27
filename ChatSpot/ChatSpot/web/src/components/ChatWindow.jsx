@@ -143,6 +143,15 @@ export default function ChatWindow({ showBack, onBack }) {
   }, [loadingMessages, messages.length]);
 
   const dmUser = activeChat?.data?.user;
+  // Resolve username from every possible location the API might put it
+  const resolvedUserName =
+    dmUser?.userName ||
+    dmUser?.username ||
+    activeChat?.data?.userName ||
+    activeChat?.data?.username ||
+    activeChat?.data?.otherUserName ||
+    activeChat?.data?.otherUsername;
+
   const chatName =
     activeChat?.type === 'group'
       ? activeChat.data?.name
@@ -150,7 +159,7 @@ export default function ChatWindow({ showBack, onBack }) {
           const first = dmUser?.firstName?.trim();
           const last  = dmUser?.lastName?.trim();
           const full  = [first, last].filter(Boolean).join(' ');
-          return full || dmUser?.userName || dmUser?.username || 'Chat';
+          return full || resolvedUserName || '';
         })();
 
   const isOnline = activeChat?.data?.user?.status === 'Online';
