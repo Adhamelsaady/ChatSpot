@@ -3,10 +3,19 @@ import { userApi, chatApi } from '../api/client';
 import { useChat } from '../context/ChatContext';
 import styles from './Modal.module.css';
 
-const Avatar = ({ name, size = 36 }) => {
+const Avatar = ({ name, src, size = 36 }) => {
   const initials = name?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '?';
   const colors = ['#7c6af0','#6a8af0','#f06a8a','#f0a06a','#6af0a8'];
   const color = colors[(name?.charCodeAt(0) || 0) % colors.length];
+  if (src) {
+    return (
+      <div style={{
+        width: size, height: size, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+      }}>
+        <img src={src} alt={name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      </div>
+    );
+  }
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%', background: color,
@@ -92,7 +101,7 @@ export default function NewChatModal({ onClose }) {
             const subtitle = fullName || u.email || '';
             return (
               <button key={u.id} className={styles.userItem} onClick={() => startChat(u)}>
-                <Avatar name={userName} />
+              <Avatar name={userName} src={u.profilePicture} />
                 <div className={styles.userInfo}>
                   <span className={styles.userName}>{userName}</span>
                   {subtitle && <span className={styles.userEmail}>{subtitle}</span>}

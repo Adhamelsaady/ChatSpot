@@ -4,7 +4,7 @@ import { enUS } from 'date-fns/locale/en-US';
 import Avatar from './Avatar';
 import styles from './MessageBubble.module.css';
 
-export default function MessageBubble({ message, isMine, showAvatar, onDelete, onReply }) {
+export default function MessageBubble({ message, isMine, showAvatar, avatarSrc, onDelete, onReply }) {
 
   const time = message.timestamp
     ? format(new Date(message.timestamp), 'h:mm a', { locale: enUS })
@@ -33,7 +33,7 @@ export default function MessageBubble({ message, isMine, showAvatar, onDelete, o
       {!isMine && (
         <div className={styles.avatarSlot}>
           {showAvatar ? (
-            <Avatar name={displayName} size={28} />
+            <Avatar name={displayName} src={avatarSrc} size={28} />
           ) : (
             <div className={styles.avatarSpacer} />
           )}

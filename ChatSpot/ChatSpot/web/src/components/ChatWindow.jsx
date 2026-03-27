@@ -191,7 +191,9 @@ export default function ChatWindow({ showBack, onBack }) {
           )}
           <Avatar
             name={chatName}
-            src={activeChat?.data?.avatarUrl || activeChat?.data?.otherUserAvatar}
+            src={activeChat?.type === 'group'
+              ? (activeChat?.data?.avatarUrl)
+              : (dmUser?.profilePicture)}
             size={36}
           />
           <div className={styles.headerInfo}>
@@ -293,6 +295,7 @@ export default function ChatWindow({ showBack, onBack }) {
                     message={msg}
                     isMine={isMine}
                     showAvatar={showAvatar}
+                    avatarSrc={!isMine ? (activeChat?.type === 'group' ? msg.senderProfilePicture : dmUser?.profilePicture) : undefined}
                     onDelete={() => deleteMessage(msg.id)}
                     onReply={() => setReplyTo(msg)}
                   />

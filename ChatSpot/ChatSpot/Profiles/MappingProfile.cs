@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Dtos.Outgoing;
 using ChatSpot.Models.NoSQL;
@@ -28,6 +28,8 @@ public class MappingProfile : Profile
                 opt => opt.MapFrom(src => src.User.UserName))
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+            .ForMember(dest => dest.ProfilePicture, 
+                opt => opt.MapFrom(src => src.User.ProfilePicture))
             .ForMember(dest => dest.JoinedAt, opt => opt.MapFrom(src => src.JoinedAt));
     }
 }

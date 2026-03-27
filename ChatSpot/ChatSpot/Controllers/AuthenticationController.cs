@@ -1,4 +1,4 @@
-﻿using ChatSpot.Contracts.Services;
+using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.Models.NoSQL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,7 +21,7 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterDto registerDto)
+    public async Task<IActionResult> Register([FromForm] RegisterDto registerDto)
     {
         if (!ModelState.IsValid)
         {

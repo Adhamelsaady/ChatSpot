@@ -1,20 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '../api/client';
 import BrandMark from '../components/BrandMark';
 import styles from './Auth.module.css';
+
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', userName: '', bio: '' });
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setProfilePicture(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setPreviewUrl(reader.result);
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await authApi.register(form);
+      const formData = new FormData();
+      formData.append('firstName', form.firstName);
+      formData.append('lastName', form.lastName);
+      formData.append('userName', form.userName);
+      formData.append('email', form.email);
+      formData.append('password', form.password);
+      if (form.bio) formData.append('bio', form.bio);
+      if (profilePicture) formData.append('profilePicture', profilePicture);
+
+      await authApi.register(formData);
       navigate('/confirm-email', { state: { email: form.email } });
     } catch (err) {
       const msg = err.response?.data;
@@ -25,6 +47,11 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  const initials = [form.firstName, form.lastName]
+    .map(n => n?.[0] || '')
+    .join('')
+    .toUpperCase() || '?';
 
   return (
     <div className={styles.page}>
@@ -38,6 +65,36 @@ export default function RegisterPage() {
         <p className={styles.subtitle}>Join ChatSpot and start connecting</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
+          {/* Avatar Picker */}
+          <div className={styles.avatarPickerWrap}>
+            <button
+              type="button"
+              className={styles.avatarPicker}
+              onClick={() => fileInputRef.current?.click()}
+              title="Upload profile picture"
+            >
+              {previewUrl ? (
+                <img src={previewUrl} alt="Preview" className={styles.avatarPickerPreview} />
+              ) : (
+                <span className={styles.avatarPickerInitials}>{initials}</span>
+              )}
+              <span className={styles.avatarPickerOverlay}>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden>
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+            <span className={styles.avatarPickerHint}>Upload photo</span>
+          </div>
+
           <div className={styles.fieldRow}>
             <div className={styles.field}>
               <label className={styles.label}>First Name</label>

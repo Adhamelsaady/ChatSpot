@@ -77,7 +77,18 @@ api.interceptors.response.use(
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 export const authApi = {
-  register: (data) => api.post('/api/auth/register', data),
+  register: (data) => {
+    const formData = data instanceof FormData ? data : (() => {
+      const fd = new FormData();
+      Object.entries(data).forEach(([key, val]) => {
+        if (val != null) fd.append(key, val);
+      });
+      return fd;
+    })();
+    return api.post('/api/auth/register', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
   confirmEmail: (data) => api.post('/api/auth/confirm-email', data),
   login: (data) => api.post('/api/auth/login', data),
   logout: (refreshToken) => api.post('/api/auth/logout', { refreshToken }),

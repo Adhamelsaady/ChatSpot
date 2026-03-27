@@ -115,7 +115,7 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
                     className={`${styles.item} ${isActive ? styles.activeItem : ''}`}
                     onClick={() => openChat({ type: 'dm', id: conv.id, data: conv })}
                 >
-                  <Avatar name={otherName} online={isOnline} />
+                  <Avatar name={otherName} src={u?.profilePicture} online={isOnline} />
                   <div className={styles.itemContent}>
                     <div className={styles.itemTop}>
                       <span className={styles.itemName}>{otherName}</span>
