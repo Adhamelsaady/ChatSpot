@@ -73,6 +73,13 @@ export default function LoginPage() {
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               required
             />
+            <Link
+              to="/forgot-password"
+              className={styles.link}
+              style={{ fontSize: '12px', alignSelf: 'flex-end', marginTop: '2px' }}
+            >
+              Forgot password?
+            </Link>
           </div>
           {error && <p className={styles.error}>{error}</p>}
           <button type="submit" className={styles.btn} disabled={loading}>

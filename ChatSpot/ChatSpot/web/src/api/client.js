@@ -93,6 +93,8 @@ export const authApi = {
   login: (data) => api.post('/api/auth/login', data),
   logout: (refreshToken) => api.post('/api/auth/logout', { refreshToken }),
   refreshToken: (data) => api.post('/api/auth/refresh-token', data),
+  forgotPassword: (email) => api.post('/api/auth/forgot-password', { email }),
+  resetPassword: (data) => api.post('/api/auth/reset-password', data),
 };
 
 // ─── Chat ────────────────────────────────────────────────────────────────────

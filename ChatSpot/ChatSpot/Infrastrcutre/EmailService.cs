@@ -1,4 +1,4 @@
-﻿using ChatSpot.Contracts.Infrastructure;
+using ChatSpot.Contracts.Infrastructure;
 
 
 namespace ChatSpot.Infrastrcutre;
@@ -51,6 +51,52 @@ public class EmailService : IEmailService
                 <div style='text-align: center; padding: 20px; color: #999; font-size: 12px;'>
                     <p>© 2026 ChatSpot. All rights reserved.</p>
                     <p>Your Premier Event Ticketing Platform</p>
+                </div>
+            </body>
+            </html>
+        ";
+
+        await SendEmailAsync(email, subject, body);
+    }
+
+    public async Task SendPasswordResetOtpAsync(string email, string firstName, string otp)
+    {
+        var subject = "Reset Your Password - ChatSpot";
+        var body = $@"
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset='utf-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            </head>
+            <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;'>
+                <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;'>
+                    <h1 style='color: white; margin: 0;'>Password Reset 🔐</h1>
+                </div>
+
+                <div style='background-color: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;'>
+                    <h2 style='color: #333;'>Hello {firstName},</h2>
+                    <p>We received a request to reset your ChatSpot password. Use the code below to complete the process.</p>
+
+                    <div style='background-color: white; padding: 20px; text-align: center; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                        <p style='margin: 0 0 10px 0; color: #666;'>Your password reset code is:</p>
+                        <h1 style='color: #667eea; font-size: 48px; letter-spacing: 8px; margin: 0; font-weight: bold;'>{otp}</h1>
+                    </div>
+
+                    <p>This code will expire in <strong>10 minutes</strong>.</p>
+
+                    <div style='background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin: 20px 0; border-radius: 4px;'>
+                        <p style='margin: 0; color: #856404;'>⚠️ If you didn't request a password reset, please ignore this email. Your account is safe.</p>
+                    </div>
+
+                    <p style='margin-top: 30px; color: #666; font-size: 14px;'>
+                        Best regards,<br>
+                        <strong>The ChatSpot Team</strong>
+                    </p>
+                </div>
+
+                <div style='text-align: center; padding: 20px; color: #999; font-size: 12px;'>
+                    <p>© 2026 ChatSpot. All rights reserved.</p>
                 </div>
             </body>
             </html>
