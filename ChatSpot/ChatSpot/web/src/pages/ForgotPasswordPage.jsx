@@ -105,7 +105,7 @@ export default function ForgotPasswordPage() {
           <>
             <h1 className={styles.title}>Reset password</h1>
             <p className={styles.subtitle}>
-              Enter the 6-digit code sent to <strong>{email}</strong> and choose a new password.
+              Enter the 6-character code sent to <strong>{email}</strong> and choose a new password.
             </p>
             <form onSubmit={handleReset} className={styles.form}>
               <div className={styles.field}>
@@ -113,12 +113,11 @@ export default function ForgotPasswordPage() {
                 <input
                   id="fp-otp"
                   type="text"
-                  inputMode="numeric"
                   className={`${styles.input} ${styles.otpInput}`}
-                  placeholder="000000"
+                  placeholder="A1b2C3"
                   maxLength={6}
                   value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => setOtp(e.target.value)}
                   required
                   autoFocus
                 />
