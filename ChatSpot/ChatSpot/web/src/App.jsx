@@ -5,6 +5,7 @@ import { ChatProvider } from './context/ChatContext';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ConfirmEmailPage from './pages/ConfirmEmailPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ChatPage from './pages/ChatPage';
 
 const ProtectedRoute = ({ children }) => {
@@ -28,6 +29,7 @@ export default function App() {
                 <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
                 <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
                 <Route path="/confirm-email" element={<PublicRoute><ConfirmEmailPage /></PublicRoute>} />
+                <Route path="/forgot-password" element={<PublicRoute><ForgotPasswordPage /></PublicRoute>} />
                 <Route path="/*" element={
                   <ProtectedRoute>
                     <ChatProvider>

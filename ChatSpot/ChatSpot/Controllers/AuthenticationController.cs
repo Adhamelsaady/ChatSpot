@@ -76,5 +76,24 @@ public class AuthenticationController : ControllerBase
         await _authenticationService.Logout(logoutDto);
         return Ok();
     }
-    
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _authenticationService.ForgotPassword(forgotPasswordDto);
+        return Ok(result.Message);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var result = await _authenticationService.ResetPassword(resetPasswordDto);
+        return result.IsSuccess ? Ok(result.Message) : BadRequest(result.Message);
+    }
 }

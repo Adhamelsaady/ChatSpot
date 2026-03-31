@@ -249,6 +249,58 @@ public class AuthenticationService : IAuthenticationService
         return result;
     }
 
+    public async Task<BaseResponse> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+    {
+        var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+        if (user == null || !user.EmailConfirmed)
+        {
+            // Return success even when user not found to avoid email enumeration
+            return new BaseResponse { IsSuccess = true, Message = $"If that email is registered, a reset code has been sent." };
+        }
+
+        user.Otp = _otpService.GenerateOtp();
+        user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+        await _userManager.UpdateAsync(user);
+
+        var firstName = user.FirstName ?? user.UserName ?? "User";
+        await _emailService.SendPasswordResetOtpAsync(user.Email!, firstName, user.Otp);
+
+        return new BaseResponse { IsSuccess = true, Message = $"If that email is registered, a reset code has been sent." };
+    }
+
+    public async Task<BaseResponse> ResetPassword(ResetPasswordDto resetPasswordDto)
+    {
+        var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+        if (user == null || !user.EmailConfirmed)
+        {
+            return new BaseResponse { IsSuccess = false, Message = "Invalid request." };
+        }
+
+        if (user.Otp != resetPasswordDto.Otp)
+        {
+            return new BaseResponse { IsSuccess = false, Message = "Invalid OTP." };
+        }
+
+        if (user.OtpExpiry < DateTime.UtcNow)
+        {
+            return new BaseResponse { IsSuccess = false, Message = "OTP has expired." };
+        }
+
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, resetToken, resetPasswordDto.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            return new BaseResponse { IsSuccess = false, Message = result.Errors.First().Description };
+        }
+
+        user.Otp = null;
+        user.OtpExpiry = null;
+        await _userManager.UpdateAsync(user);
+
+        return new BaseResponse { IsSuccess = true, Message = "Password has been reset successfully." };
+    }
+
     private DateTime UnixTimeToDateTime(long unixTime)
     {
         var result = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
