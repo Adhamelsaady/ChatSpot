@@ -24,10 +24,7 @@ public class AuthenticationController : ControllerBase
     public async Task<IActionResult> Register([FromForm] RegisterDto registerDto)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
-
         var result = await _authenticationService.Register(registerDto);
         return result.IsSuccess ? Ok(result.Message) : BadRequest(result.Message);
     }
@@ -36,9 +33,7 @@ public class AuthenticationController : ControllerBase
     public async Task<IActionResult> ConfirmEmail(RegisterationConfirmationDto registerationConfirmationDto)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
         var result = await _authenticationService.ConfirmEmail(registerationConfirmationDto);
         return result.IsSuccess ? Ok(result.Message) : BadRequest(result.Message);
     }
@@ -47,9 +42,7 @@ public class AuthenticationController : ControllerBase
     public async Task<IActionResult> Login(LoginDto loginDto)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
         var result = await _authenticationService.Login(loginDto);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Message);
     }
@@ -63,20 +56,11 @@ public class AuthenticationController : ControllerBase
         var validationParameters = jwtOptions.TokenValidationParameters.Clone();
         validationParameters.ValidateLifetime = false;
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
+
         var result = await _authenticationService.RefreshToken(refreshTokenDto);
         return result.IsSuccess ? Ok(result) : BadRequest(result.Message);
     }
-
-    [HttpPost("logout")]
-    public async Task<IActionResult> Logout(LogoutDto logoutDto)
-    {
-        await _authenticationService.Logout(logoutDto);
-        return Ok();
-    }
-
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
     {
@@ -96,4 +80,14 @@ public class AuthenticationController : ControllerBase
         var result = await _authenticationService.ResetPassword(resetPasswordDto);
         return result.IsSuccess ? Ok(result.Message) : BadRequest(result.Message);
     }
+    
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(LogoutDto logoutDto)
+    {
+        await _authenticationService.Logout(logoutDto);
+        return Ok();
+    }
+
+   
 }

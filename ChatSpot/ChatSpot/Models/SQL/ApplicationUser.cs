@@ -7,7 +7,7 @@ public class ApplicationUser : IdentityUser
 {
     [MaxLength(300)] public string Bio { get; set; } = "";
 
-    public string ProfilePicture { get; set; } = string.Empty;
+    public string? ProfilePicture { get; set; } = string.Empty;
     public string? FirstName { get; set; } = string.Empty;
     public string? LastName { get; set; } = string.Empty;
     public bool isOnline { get; set; } = false;

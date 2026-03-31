@@ -254,7 +254,6 @@ public class AuthenticationService : IAuthenticationService
         var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
         if (user == null || !user.EmailConfirmed)
         {
-            // Return success even when user not found to avoid email enumeration
             return new BaseResponse { IsSuccess = true, Message = $"If that email is registered, a reset code has been sent." };
         }
 
