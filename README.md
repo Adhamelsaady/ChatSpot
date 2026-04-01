@@ -454,8 +454,8 @@ ChatSpot/
     </td>
     <td align="center">
       <a href="https://github.com/Tarik-Lotfy">
-        <img src="https://github.com/Tarik-Lotfy.png" width="80px" style="border-radius:50%" alt="Tarik Lotft"/><br />
-        <strong>Tarik Lotft</strong>
+        <img src="https://github.com/Tarik-Lotfy.png" width="80px" style="border-radius:50%" alt="Tarik Lotfy"/><br />
+        <strong>Tarik Lotfy</strong>
       </a><br />
       🎨 Frontend & Mobile
     </td>
