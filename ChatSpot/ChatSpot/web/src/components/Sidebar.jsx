@@ -4,6 +4,7 @@ import { useChat } from '../context/ChatContext';
 import { formatDistanceToNow } from 'date-fns';
 import Avatar from './Avatar';
 import BrandMark from './BrandMark';
+import ProfileModal from './ProfileModal';
 import styles from './Sidebar.module.css';
 
 export default function Sidebar({ onNewChat, onNewGroup }) {
@@ -11,6 +12,7 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
   const { conversations, groups, activeChat, openChat } = useChat();
   const [tab, setTab] = useState('dms');
   const [search, setSearch] = useState('');
+  const [showProfile, setShowProfile] = useState(false);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -169,6 +171,11 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
             <span className={styles.userName}>{user?.username}</span>
             <span className={styles.userStatus}>Online</span>
           </div>
+          <button className={styles.iconBtn} onClick={() => setShowProfile(true)} title="My profile">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </button>
           <button className={styles.iconBtn} onClick={logout} title="Sign out">
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -177,6 +184,8 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
             </svg>
           </button>
         </div>
+
+        {showProfile && <ProfileModal onClose={() => setShowProfile(false)} />}
       </aside>
   );
 }

@@ -136,4 +136,10 @@ export const groupApi = {
 // ─── User ────────────────────────────────────────────────────────────────────
 export const userApi = {
   search: (params) => api.get('/api/user/search', { params }),
+  getMe: () => api.get('/api/user/me'),
+  updateMe: (formData) =>
+    api.put('/api/user/me', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  changePassword: (data) => api.post('/api/user/me/change-password', data),
 };
