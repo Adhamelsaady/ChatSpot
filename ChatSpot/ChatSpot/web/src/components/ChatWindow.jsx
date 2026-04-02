@@ -11,7 +11,9 @@ import Avatar from './Avatar';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
 import GroupInfoPanel from './GroupInfoPanel';
+import { userApi } from '../api/client';
 import styles from './ChatWindow.module.css';
+import modalStyles from './Modal.module.css';
 
 const SCROLL_LOAD_THRESHOLD = 120;
 const STICK_BOTTOM_PX = 140;
@@ -37,6 +39,11 @@ export default function ChatWindow({ showBack, onBack }) {
   const messagesContainerRef = useRef(null);
   const messagesInnerRef = useRef(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [showUserProfile, setShowUserProfile] = useState(false);
+  const [profileUserId, setProfileUserId] = useState(null);
+  const [profileData, setProfileData] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState(null);
 
   const stickToBottomRef = useRef(true);
   const prependAnchorRef = useRef(null);
@@ -165,6 +172,30 @@ export default function ChatWindow({ showBack, onBack }) {
           ? `Last seen ${new Date(lastSeen).toLocaleString()}`
           : 'Offline';
 
+  const canViewOtherProfile = activeChat?.type === 'dm' && !!dmUser?.id;
+
+  const openOtherProfile = async () => {
+    if (!canViewOtherProfile) return;
+    const id = dmUser.id;
+    setShowUserProfile(true);
+    setProfileUserId(id);
+
+    // Optimistic display using the chat payload
+    setProfileData(dmUser);
+    setProfileLoading(true);
+    setProfileError(null);
+
+    try {
+      const { data } = await userApi.getById(id);
+      setProfileData(data);
+    } catch {
+      // If fetch fails, keep the optimistic payload (dmUser) visible.
+      setProfileError('Could not load full profile details.');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
   return (
     <div className={styles.window}>
       <div className={styles.header}>
@@ -197,7 +228,23 @@ export default function ChatWindow({ showBack, onBack }) {
             size={36}
           />
           <div className={styles.headerInfo}>
-            <span className={styles.chatName}>{chatName}</span>
+            <span
+              className={styles.chatName}
+              role={canViewOtherProfile ? 'button' : undefined}
+              tabIndex={canViewOtherProfile ? 0 : undefined}
+              onClick={canViewOtherProfile ? openOtherProfile : undefined}
+              onKeyDown={(e) => {
+                if (!canViewOtherProfile) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  openOtherProfile();
+                }
+              }}
+              style={canViewOtherProfile ? { cursor: 'pointer', textDecoration: 'underline' } : undefined}
+              title={canViewOtherProfile ? 'View profile' : undefined}
+            >
+              {chatName}
+            </span>
             <span
               className={`${styles.chatSub} ${activeChat?.data?.isOnline ? styles.online : ''}`}
             >
@@ -342,6 +389,90 @@ export default function ChatWindow({ showBack, onBack }) {
         )}
         <MessageInput />
       </div>
+
+      {showUserProfile && canViewOtherProfile && (
+        <div className={modalStyles.overlay} onClick={() => setShowUserProfile(false)}>
+          <div
+            className={modalStyles.modal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={modalStyles.header}>
+              <h2 className={modalStyles.title}>Profile</h2>
+              <button
+                className={modalStyles.closeBtn}
+                onClick={() => setShowUserProfile(false)}
+                aria-label="Close"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            <div className={modalStyles.body}>
+              <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+                <Avatar
+                  name={profileData?.userName || profileData?.firstName || 'User'}
+                  src={profileData?.profilePicture}
+                  size={56}
+                />
+                <div style={{ minWidth: 0 }}>
+                  <div className={modalStyles.userName} style={{ fontSize: 15 }}>
+                    {profileData?.userName ||
+                      [profileData?.firstName, profileData?.lastName]
+                        .filter(Boolean)
+                        .join(' ') ||
+                      'Unknown'}
+                  </div>
+                  {profileData?.email && (
+                    <div className={modalStyles.userEmail}>{profileData.email}</div>
+                  )}
+                  {profileData?.status && (
+                    <div className={modalStyles.userEmail} style={{ marginTop: 2 }}>
+                      Status: {profileData.status}
+                    </div>
+                  )}
+                  {profileData?.lastSeen && (
+                    <div className={modalStyles.userEmail} style={{ marginTop: 2 }}>
+                      Last seen: {new Date(profileData.lastSeen).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {profileLoading ? (
+                <div className={modalStyles.empty} style={{ paddingTop: 10 }}>
+                  Loading…
+                </div>
+              ) : (
+                <>
+                  <div style={{ height: 1, background: 'var(--border)', margin: '12px 0' }} />
+                  <div className={modalStyles.userEmail} style={{ color: 'var(--text-secondary)' }}>
+                    Bio
+                  </div>
+                  <div className={modalStyles.userEmail} style={{ whiteSpace: 'pre-wrap', lineHeight: 1.35 }}>
+                    {profileData?.bio ? profileData.bio : 'No bio yet.'}
+                  </div>
+                </>
+              )}
+
+              {profileError && (
+                <div className={modalStyles.error} style={{ marginTop: 10 }}>
+                  {profileError}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
