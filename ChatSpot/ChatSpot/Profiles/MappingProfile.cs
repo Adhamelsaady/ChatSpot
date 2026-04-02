@@ -16,7 +16,8 @@ public class MappingProfile : Profile
         CreateMap<MessageDocument, MessageToReturnDto>();
         CreateMap<ApplicationUser , UserDto>()
             .ForMember(dest => dest.Status , 
-                opt => opt.MapFrom(src => src.isOnline ? "Online" : "Offline"));
+                opt => opt.MapFrom(src => src.isOnline ? "Online" : "Offline"))
+            .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => src.Bio));
         CreateMap<GroupToCreateDto, Group>()
             .ForMember(dest => dest.Members, opt => opt.MapFrom(src => 
                 src.Members.Select(id => new GroupMember { UserId = id })));

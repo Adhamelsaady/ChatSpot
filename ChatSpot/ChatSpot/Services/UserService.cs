@@ -62,6 +62,13 @@ public class UserService : IUserService
         };
     }
 
+    public async Task<UserDto?> GetUserById(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) return null;
+        return _mapper.Map<UserDto>(user);
+    }
+
     public async Task<BaseResponse> UpdateProfile(string userId, UpdateProfileDto dto)
     {
         var user = await _userManager.FindByIdAsync(userId);

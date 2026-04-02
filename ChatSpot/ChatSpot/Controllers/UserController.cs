@@ -36,6 +36,14 @@ public class UserController : ControllerBase
         return Ok(profile);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetUserById(string id)
+    {
+        var user = await _userService.GetUserById(id);
+        if (user == null) return NotFound();
+        return Ok(user);
+    }
+
     [HttpPut("me")]
     public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileDto dto)
     {
