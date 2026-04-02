@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos.Ingoing;
 using ChatSpot.ResourceParameters;
@@ -39,7 +39,7 @@ public class ChatController : ControllerBase
         return Ok(result);
     }
     
-    [HttpPost("{conversationId}/send-message")]
+    [HttpPost("{conversationId}")]
     public async Task<IActionResult> SendMessage([FromBody] MessageForSending messageForSending , [FromRoute] string conversationId)
     {
         if (!ModelState.IsValid)
@@ -53,7 +53,7 @@ public class ChatController : ControllerBase
         else return  BadRequest(result);
     }
 
-    [HttpDelete("{conversationId}/delete-message")]
+    [HttpDelete("{conversationId}")]
     public async Task<IActionResult> DeleteMessage([FromRoute] string conversationId,
         [FromBody] DeleteMessageDto deleteMessageDto)
     {

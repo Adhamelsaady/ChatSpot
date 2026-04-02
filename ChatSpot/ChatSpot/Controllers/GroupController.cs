@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using ChatSpot.Contracts.Persistence;
 using ChatSpot.Contracts.Services;
 using ChatSpot.Dtos.Ingoing;
@@ -37,7 +37,7 @@ public class GroupController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("{groupId::guid}/send-message")]
+    [HttpPost("{groupId::guid}")]
     public async Task<IActionResult> SendMessage([FromBody] MessageForSending messageForSending , [FromRoute] Guid groupId)
     {
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -46,7 +46,7 @@ public class GroupController : ControllerBase
         return Ok(result);
     }
     
-    [HttpPost("create-group")]
+    [HttpPost]
     public async Task<IActionResult> CreateGroup([FromBody] GroupToCreateDto createGroupDt)
     {
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
@@ -62,7 +62,7 @@ public class GroupController : ControllerBase
         return result.IsSuccess ? Ok(result) :  Forbid();
     }
     
-    [HttpDelete("{groupId::guid}/delete-message")]
+    [HttpDelete("{groupId::guid}")]
     public async Task<IActionResult> DeleteMessage([FromRoute] string groupId,
         [FromBody] DeleteMessageDto deleteMessageDto)
     {

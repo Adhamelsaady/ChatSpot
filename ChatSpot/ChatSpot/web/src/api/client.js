@@ -105,9 +105,9 @@ export const chatApi = {
   createConversation: (otherUserId) =>
     api.post('/api/chat/create-conversation', { otherUserId }),
   sendMessage: (conversationId, content, replyToId = null) =>
-    api.post(`/api/chat/${conversationId}/send-message`, { content, replyToId }),
+    api.post(`/api/chat/${conversationId}`, { content, replyToId }),
   deleteMessage: (conversationId, messageId) =>
-    api.delete(`/api/chat/${conversationId}/delete-message`, {
+    api.delete(`/api/chat/${conversationId}`, {
       data: { messageId },
     }),
 };
@@ -117,11 +117,11 @@ export const groupApi = {
   getGroups: (params) => api.get('/api/group', { params }),
   getGroupMessages: (groupId, params) =>
     api.get(`/api/group/${groupId}`, { params }),
-  createGroup: (data) => api.post('/api/group/create-group', data),
+  createGroup: (data) => api.post('/api/group', data),
   sendGroupMessage: (groupId, content, replyToId = null) =>
-    api.post(`/api/group/${groupId}/send-message`, { content, replyToId }),
+    api.post(`/api/group/${groupId}`, { content, replyToId }),
   deleteGroupMessage: (groupId, messageId) =>
-    api.delete(`/api/group/${groupId}/delete-message`, { data: { messageId } }),
+    api.delete(`/api/group/${groupId}`, { data: { messageId } }),
   getMembers: (groupId, params) =>
     api.get(`/api/group/${groupId}/members`, { params }),
   addMembers: (groupId, userIds) =>
