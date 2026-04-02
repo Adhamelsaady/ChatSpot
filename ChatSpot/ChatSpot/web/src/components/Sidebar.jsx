@@ -81,7 +81,7 @@ export default function Sidebar({ onNewChat, onNewGroup }) {
         <div className={styles.tabs}>
           <button
               className={`${styles.tab} ${tab === 'dms' ? styles.activeTab : ''}`}
-              onClick={() => setTab('dms')}
+              onClick={() => { setTab('dms'); onNewChat(); }}
           >
             Messages
             {conversations.length > 0 && <span className={styles.count}>{conversations.length}</span>}

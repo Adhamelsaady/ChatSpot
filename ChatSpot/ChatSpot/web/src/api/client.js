@@ -137,6 +137,7 @@ export const groupApi = {
 export const userApi = {
   search: (params) => api.get('/api/user/search', { params }),
   getMe: () => api.get('/api/user/me'),
+  getById: (id) => api.get(`/api/user/${id}`),
   updateMe: (formData) =>
     api.put('/api/user/me', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
