@@ -195,6 +195,16 @@ public class ChatService : IChatService
                 IsSuccess = false, Message = "Already deleted"
             };
         }
+        if (!string.IsNullOrEmpty(message.MediaPublicId))
+        {
+            var resourceType = message.MediaType switch
+            {
+                "image" => ResourceType.Image,
+                "video" or "audio" => ResourceType.Video,
+                _ => ResourceType.Raw
+            };
+            await _cloudinary.DestroyAsync(new DeletionParams(message.MediaPublicId) { ResourceType = resourceType });
+        }
 
         await _messageRepository.DeleteMessageAsync(messageId);
         var conversationSnap = await _conversationRepository.GetByIdAsync(message.ConversationId);
