@@ -129,7 +129,9 @@ public class ChatService : IChatService
         {
             var messageToReply = await _messageRepository.GetMessageByIdAsync(messageForSending.ReplyToId);
             if (messageToReply.IsDeleted) replyPreview = "Deleted Message";
-            else replyPreview = messageToReply.Content[..Math.Min(60, messageToReply.Content.Length)];
+            else if (!string.IsNullOrEmpty(messageToReply.Content))
+                replyPreview = messageToReply.Content[..Math.Min(60, messageToReply.Content.Length)];
+            else replyPreview = "📎 Media";
         }
 
         messageDocument.ReceiverId = await GetReceiverIdAsync(conversationId, currentUser);
