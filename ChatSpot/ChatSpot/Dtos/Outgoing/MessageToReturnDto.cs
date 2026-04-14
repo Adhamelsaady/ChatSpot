@@ -24,4 +24,7 @@ public class MessageToReturnDto : BaseResponse
     public string? ReplyToId { get; set; }
     
     public string? ReplyToPreview { get; set; }
+    
+    public string? MediaUrl { get; set; }
+    public string? MediaType { get; set; } 
 }
