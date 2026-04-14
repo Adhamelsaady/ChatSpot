@@ -10,6 +10,8 @@ using ChatSpot.Hubs;
 using ChatSpot.Models.NoSQL;
 using ChatSpot.Models.SQL;
 using ChatSpot.ResourceParameters;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ChatSpot.Services;
@@ -21,18 +23,21 @@ public class ChatService : IChatService
     private readonly IConversationRepository _conversationRepository;
     private readonly IMapper _mapper;
     private readonly IHubContext<ChatHub> _chatHub;
+    private readonly Cloudinary _cloudinary;
 
     public ChatService(IBaseRepository<ApplicationUser> userRepository
         , IMessageRepository messageRepository
         , IConversationRepository conversationRepository
         , IMapper mapper
-        , IHubContext<ChatHub> chatHub)
+        , IHubContext<ChatHub> chatHub 
+        , Cloudinary cloudinary)
     {
         _userRepository = userRepository;
         _messageRepository = messageRepository;
         _conversationRepository = conversationRepository;
         _mapper = mapper;
         _chatHub = chatHub;
+        _cloudinary = cloudinary;
     }
 
 
@@ -67,6 +72,58 @@ public class ChatService : IChatService
         string conversationId)
     {
         var messageDocument = _mapper.Map<MessageDocument>(messageForSending);
+
+        if (messageForSending.Media != null)
+        {
+            const long maxSize = 100 * 1024 * 1024;
+            if (messageForSending.Media.Length > maxSize)
+                return new MessageToReturnDto { IsSuccess = false, Message = "File size exceeds 100MB limit." };
+            var resourceType = GetCloudinaryResourceType(messageForSending.Media.ContentType);
+
+            using var stream = messageForSending.Media.OpenReadStream();
+            var uploadParams = new RawUploadParams
+            {
+                File = new FileDescription(messageForSending.Media.FileName, stream),
+                Folder = $"chatspot/messages/{resourceType}",
+                PublicId = Guid.NewGuid().ToString()
+            };
+            RawUploadResult uploadResult;
+
+            if (resourceType == "image")
+            {
+                var imageParams = new ImageUploadParams
+                {
+                    File = uploadParams.File,
+                    Folder = uploadParams.Folder,
+                    PublicId = uploadParams.PublicId,
+                    Transformation = new Transformation().Quality("auto").FetchFormat("auto")
+                };
+                uploadResult = await _cloudinary.UploadAsync(imageParams);
+            }
+            else if (resourceType == "video")
+            {
+                var videoParams = new VideoUploadParams
+                {
+                    File = uploadParams.File,
+                    Folder = uploadParams.Folder,
+                    PublicId = uploadParams.PublicId
+                };
+                uploadResult = await _cloudinary.UploadAsync(videoParams);
+            }
+            else
+            {
+                uploadResult = await _cloudinary.UploadAsync(uploadParams);
+            }
+
+            if (uploadResult.Error != null)
+                return new MessageToReturnDto { IsSuccess = false, Message = "Failed to upload media." };
+
+            messageDocument.MediaUrl = uploadResult.SecureUrl.ToString();
+            messageDocument.MediaPublicId = uploadResult.PublicId;
+            messageDocument.MediaType = resourceType;
+            messageDocument.MessageType = resourceType;
+        }
+        
         string? replyPreview = null;
         if (!string.IsNullOrEmpty(messageForSending.ReplyToId))
         {
@@ -162,4 +219,11 @@ public class ChatService : IChatService
         var conversation = await _conversationRepository.GetByIdAsync(conversationId);
         return (conversation.Participants[0] == userId ? conversation.Participants[1] : conversation.Participants[0]);
     }
+    private string GetCloudinaryResourceType(string contentType) => contentType switch
+    {
+        var t when t.StartsWith("image/") => "image",
+        var t when t.StartsWith("video/") => "video",
+        var t when t.StartsWith("audio/") => "audio",
+        _ => "raw"
+    };
 }
