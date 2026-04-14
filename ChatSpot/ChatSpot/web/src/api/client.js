@@ -104,8 +104,15 @@ export const chatApi = {
     api.get(`/api/chat/${conversationId}`, { params }),
   createConversation: (otherUserId) =>
     api.post('/api/chat/create-conversation', { otherUserId }),
-  sendMessage: (conversationId, content, replyToId = null) =>
-    api.post(`/api/chat/${conversationId}`, { content, replyToId }),
+  sendMessage: (conversationId, content, replyToId = null, media = null) => {
+    const fd = new FormData();
+    fd.append('Content', content);
+    if (replyToId) fd.append('ReplyToId', replyToId);
+    if (media) fd.append('Media', media);
+    return api.post(`/api/chat/${conversationId}`, fd, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
   deleteMessage: (conversationId, messageId) =>
     api.delete(`/api/chat/${conversationId}`, {
       data: { messageId },
@@ -118,8 +125,18 @@ export const groupApi = {
   getGroupMessages: (groupId, params) =>
     api.get(`/api/group/${groupId}`, { params }),
   createGroup: (data) => api.post('/api/group', data),
-  sendGroupMessage: (groupId, content, replyToId = null) =>
-    api.post(`/api/group/${groupId}`, { content, replyToId }),
+  sendGroupMessage: (groupId, content, replyToId = null, media = null) => {
+    if (media) {
+      const fd = new FormData();
+      fd.append('Content', content);
+      if (replyToId) fd.append('ReplyToId', replyToId);
+      fd.append('Media', media);
+      return api.post(`/api/group/${groupId}`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    }
+    return api.post(`/api/group/${groupId}`, { content, replyToId });
+  },
   deleteGroupMessage: (groupId, messageId) =>
     api.delete(`/api/group/${groupId}`, { data: { messageId } }),
   getMembers: (groupId, params) =>
