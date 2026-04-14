@@ -50,4 +50,13 @@ public class MessageDocument
 
     [BsonElement("replyToPreview")]
     public string? ReplyToPreview { get; set; }
+    
+    [BsonElement("mediaUrl")]
+    public string? MediaUrl { get; set; }
+
+    [BsonElement("mediaPublicId")]
+    public string? MediaPublicId { get; set; }
+
+    [BsonElement("mediaType")]
+    public string? MediaType { get; set; } 
 }
