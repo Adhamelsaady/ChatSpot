@@ -315,20 +315,20 @@ export const ChatProvider = ({ children }) => {
     }
   }, [loadMessages]);
 
-  const sendMessage = useCallback(async (content) => {
-    if (!activeChat || !content.trim()) return;
+  const sendMessage = useCallback(async (content, media = null) => {
+    if (!activeChat || (!content.trim() && !media)) return;
     const replyToId = replyTo?.id || null;
     setReplyTo(null);
     try {
       if (activeChat.type === 'dm') {
-        const { data } = await chatApi.sendMessage(activeChat.id, content, replyToId);
+        const { data } = await chatApi.sendMessage(activeChat.id, content, replyToId, media);
         const hub = hubRef.current;
         if (hub) {
           await hub.invoke('SendDirectMessage', activeChat.id, { content, replyToId }, data)
               .catch(console.error);
         }
       } else {
-        const { data } = await groupApi.sendGroupMessage(activeChat.id, content, replyToId);
+        const { data } = await groupApi.sendGroupMessage(activeChat.id, content, replyToId, media);
         const hub = hubRef.current;
         if (hub) {
           await hub.invoke('SendGroupMessage', activeChat.id, { content, replyToId }, data)
