@@ -42,7 +42,7 @@ export default function MessageInput() {
     setText('');
     clearMedia();
     try {
-      await sendMessage(trimmed || ' ', currentMedia);
+      await sendMessage(trimmed, currentMedia);
     } finally {
       setSending(false);
       textareaRef.current?.focus();

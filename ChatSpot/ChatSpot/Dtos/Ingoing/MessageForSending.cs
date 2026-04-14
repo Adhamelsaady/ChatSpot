@@ -1,11 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace ChatSpot.Dtos.Ingoing;
 
 public class MessageForSending
 {
-    [Required]
-    public string Content { get; set; } 
+    public string Content { get; set; } = string.Empty;
     public string? ReplyToId { get; set; } = string.Empty;
     
     public IFormFile? Media { get; set; }
