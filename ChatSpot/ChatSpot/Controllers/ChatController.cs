@@ -40,7 +40,7 @@ public class ChatController : ControllerBase
     }
     
     [HttpPost("{conversationId}")]
-    public async Task<IActionResult> SendMessage([FromBody] MessageForSending messageForSending , [FromRoute] string conversationId)
+    public async Task<IActionResult> SendMessage([FromForm] MessageForSending messageForSending , [FromRoute] string conversationId)
     {
         if (!ModelState.IsValid)
         {
