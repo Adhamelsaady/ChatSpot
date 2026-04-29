@@ -14,4 +14,5 @@ public interface IAuthenticationService
     Task<bool> Logout(LogoutDto logoutDto);
     Task<BaseResponse> ForgotPassword(ForgotPasswordDto forgotPasswordDto);
     Task<BaseResponse> ResetPassword(ResetPasswordDto resetPasswordDto);
+    Task<AuthResult> GoogleLogin(GoogleLoginDto googleLoginDto);
 }

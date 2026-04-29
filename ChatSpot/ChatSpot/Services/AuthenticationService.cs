@@ -11,6 +11,8 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Google.Apis.Auth;
+using Microsoft.Extensions.Configuration;
 
 namespace ChatSpot.Services;
 
@@ -25,6 +27,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly Cloudinary _cloudinary;
+    private readonly IConfiguration _configuration;
 
     public AuthenticationService(
         UserManager<ApplicationUser> userManager,
@@ -35,7 +38,8 @@ public class AuthenticationService : IAuthenticationService
         IJwtTokenGeneration jwtTokenGeneration,
         TokenValidationParameters tokenValidationParameters,
         IRefreshTokenRepository refreshTokenRepository, 
-        Cloudinary cloudinary)
+        Cloudinary cloudinary,
+        IConfiguration configuration)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -46,6 +50,56 @@ public class AuthenticationService : IAuthenticationService
         _tokenValidationParameters = tokenValidationParameters;
         _refreshTokenRepository = refreshTokenRepository;
         _cloudinary = cloudinary;
+        _configuration = configuration;
+    }
+
+    public async Task<AuthResult> GoogleLogin(GoogleLoginDto googleLoginDto)
+    {
+        try
+        {
+            var settings = new GoogleJsonWebSignature.ValidationSettings();
+            var clientId = _configuration["GoogleAuth:ClientId"];
+            if (!string.IsNullOrEmpty(clientId))
+            {
+                settings.Audience = new[] { clientId };
+            }
+
+            var payload = await GoogleJsonWebSignature.ValidateAsync(googleLoginDto.IdToken, settings);
+            
+            var user = await _userManager.FindByEmailAsync(payload.Email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = payload.Email.Split('@')[0] + "_" + Guid.NewGuid().ToString("N").Substring(0, 4),
+                    Email = payload.Email,
+                    EmailConfirmed = true,
+                    FirstName = payload.GivenName,
+                    LastName = payload.FamilyName,
+                    ProfilePicture = payload.Picture
+                };
+
+                var result = await _userManager.CreateAsync(user);
+                if (!result.Succeeded)
+                {
+                    return new AuthResult { IsSuccess = false, Message = "Failed to create user account." };
+                }
+            }
+            
+            var authResult = await _jwtTokenGeneration.GenerateJwtToken(user);
+            authResult.IsSuccess = true;
+            authResult.Message = "Login successful";
+            authResult.ProfilePicture = user.ProfilePicture ?? string.Empty;
+            return authResult;
+        }
+        catch (InvalidJwtException)
+        {
+            return new AuthResult { IsSuccess = false, Message = "Invalid Google ID Token." };
+        }
+        catch (Exception ex)
+        {
+            return new AuthResult { IsSuccess = false, Message = "An error occurred during Google Login." };
+        }
     }
 
     public async Task<BaseResponse> Register(RegisterDto registerDto)
