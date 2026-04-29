@@ -47,6 +47,16 @@ public class AuthenticationController : ControllerBase
         return result.IsSuccess ? Ok(result) : BadRequest(result.Message);
     }
 
+    [HttpPost("google-login")]
+    public async Task<IActionResult> GoogleLogin(GoogleLoginDto googleLoginDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        var result = await _authenticationService.GoogleLogin(googleLoginDto);
+        return result.IsSuccess ? Ok(result) : BadRequest(result.Message);
+    }
+
     [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken(RefreshTokenDto refreshTokenDto)
     {
