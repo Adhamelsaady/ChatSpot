@@ -1,10 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { authApi } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import BrandMark from '../components/BrandMark';
 import styles from './Auth.module.css';
 
 export default function RegisterPage() {
+  const { googleLogin } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '', userName: '', bio: '' });
   const [profilePicture, setProfilePicture] = useState(null);
@@ -20,6 +23,22 @@ export default function RegisterPage() {
     const reader = new FileReader();
     reader.onloadend = () => setPreviewUrl(reader.result);
     reader.readAsDataURL(file);
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError('');
+    setLoading(true);
+    try {
+      await googleLogin(credentialResponse.credential);
+      navigate('/');
+    } catch (err) {
+      const msg = err.response?.data;
+      if (typeof msg === 'string') setError(msg);
+      else if (Array.isArray(msg)) setError(msg.map(e => e.description || e).join(', '));
+      else setError('Google sign up failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -165,6 +184,15 @@ export default function RegisterPage() {
             {loading ? <span className={styles.spinner} /> : 'Create Account'}
           </button>
         </form>
+
+        <div className={styles.divider}>or sign up with</div>
+        <div className={styles.googleLoginWrapper}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google Sign-Up failed')}
+            locale="en"
+          />
+        </div>
 
         <p className={styles.footer}>
           Already have an account? <Link to="/login" className={styles.link}>Sign in</Link>

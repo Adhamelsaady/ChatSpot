@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import BrandMark from '../components/BrandMark';
 import styles from './Auth.module.css';
@@ -20,11 +21,24 @@ function loginErrorMessage(err) {
 }
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ emailOrUserName: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError('');
+    setLoading(true);
+    try {
+      await googleLogin(credentialResponse.credential);
+      navigate('/');
+    } catch (err) {
+      setError(loginErrorMessage(err) || 'Google sign in failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,6 +100,16 @@ export default function LoginPage() {
             {loading ? <span className={styles.spinner} /> : 'Sign In'}
           </button>
         </form>
+
+        <div className={styles.divider}>or continue with</div>
+        <div className={styles.googleLoginWrapper}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google Sign-In failed')}
+            useOneTap
+            locale="en"
+          />
+        </div>
 
         <p className={styles.footer}>
           Don't have an account? <Link to="/register" className={styles.link}>Create one</Link>

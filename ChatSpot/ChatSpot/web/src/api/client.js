@@ -91,6 +91,7 @@ export const authApi = {
   },
   confirmEmail: (data) => api.post('/api/auth/confirm-email', data),
   login: (data) => api.post('/api/auth/login', data),
+  googleLogin: (idToken) => api.post('/api/auth/google-login', { idToken }),
   logout: (refreshToken) => api.post('/api/auth/logout', { refreshToken }),
   refreshToken: (data) => api.post('/api/auth/refresh-token', data),
   forgotPassword: (email) => api.post('/api/auth/forgot-password', { email }),

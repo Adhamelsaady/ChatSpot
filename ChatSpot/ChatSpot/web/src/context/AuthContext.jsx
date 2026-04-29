@@ -66,8 +66,25 @@ export const AuthProvider = ({ children }) => {
     window.location.href = new URL(import.meta.env.BASE_URL || '/', window.location.origin).href;
   }, []);
 
+  const googleLogin = useCallback(async (idToken) => {
+    const { data } = await authApi.googleLogin(idToken);
+    localStorage.setItem('accessToken', data.token);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    if (data.profilePicture) localStorage.setItem('profilePicture', data.profilePicture);
+    const payload = decodeJwt(data.token);
+    const userData = {
+      id: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
+      email: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+      username: payload?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
+      profilePicture: data.profilePicture || '',
+      token: data.token,
+    };
+    setUser(userData);
+    return userData;
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, googleLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );
